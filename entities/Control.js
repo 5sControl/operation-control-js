@@ -94,6 +94,7 @@ class Control {
     async getWorkersPredictions(workers) {
         if (!this.camera.snapshot.buffer) return
         const wnRes = await workers[0].exec(this.camera.snapshot.buffer)
+        console.log()
         let woRes = []
         let worker = wnRes.find(d => d.class === 'worker')
         if (worker) {

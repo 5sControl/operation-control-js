@@ -19,14 +19,14 @@ class Camera {
     constructor() {
     }
 
-    async init(reqBody, isDebug = false, SERVER_IP) {
+    async init(reqBody, isDebug = false, folder) {
         this.serverUrl = reqBody["server_url"]
-        this.hostname = SERVER_IP
+        this.hostname = folder.split('/')[1]
         this.snapshot.uri = reqBody["camera_url"]
 
         this.auth()
         await this.getSnapshot()
-        isExists(`images/${SERVER_IP}`)
+        isExists(folder)
         // this.setResolution()
 
         const interval = setInterval(async () => {
