@@ -1,4 +1,4 @@
-const {djangoDate, bBox} = require('../../utils')
+const {djangoDate, bBox, isExists} = require('../../utils')
 const {Control} = require('../Control')
 const Snapshot = require('../Snapshot')
 
@@ -17,7 +17,7 @@ class CornerCleaning extends Control {
     cornersProcessed = 0
 
     WORKSPACE_BOUNDARIES = [1600, 900]
-    HKK_MIN_SCORE = 0.7
+    HKK_MIN_SCORE = 0.9
 
     // counters
     isBeginTimer = 0
@@ -30,7 +30,9 @@ class CornerCleaning extends Control {
     }
     processedSide = null
     timeFromLastProcessedCorner = 0
-    
+    cornersState = [false, false, false, false]
+    isLocalDebug = false
+
     hkkCounter = 0
     hkkLast = null
 
@@ -38,7 +40,7 @@ class CornerCleaning extends Control {
 
     constructor(...args) {
         super(...args)
-        this.setVersion("v0.3.1")
+        this.setVersion("v1.0.0-rc.1")
     }
     async check() {
         if (this.camera.isVideoStreamOnPause()) return
@@ -88,7 +90,7 @@ class CornerCleaning extends Control {
         this.processedSide = null
         this.timeFromLastProcessedCorner = 0
         this.hkkLast = null
-        
+
         this.writeToLogs(EVENTS[EVENTS.length - 1])
 
         // operation.sendToReports
@@ -98,6 +100,7 @@ class CornerCleaning extends Control {
             stopTracking: this.stopTracking
         })
         this.cornersProcessed = 0
+        this.cornersState = [false, false, false, false]
         this.startTracking = null
         this.stopTracking = null
 
@@ -106,10 +109,15 @@ class CornerCleaning extends Control {
         this.timeFromLastProcessedCorner++
         let isHKKdetected = this.isAnyDetections(["hkk"], "boolean", this.HKK_MIN_SCORE)
         if (isHKKdetected) {
+            // also 2D (is hkk-rect in wspace-rect)
             const [x, y] = bBox.getOrigin(this.predictions.o[0].bbox)
             if (x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1]) {
-                this.hkkCounter++
-                this.hkkLast = this.predictions.o[0]
+                if (this.isOperationOnWindow(this.predictions.o[0].bbox, this.window.bbox)) {
+                    this.hkkCounter++
+                    this.hkkLast = this.predictions.o[0]
+                } else {
+                    this.writeToLogs('hkk not on window!')
+                }
             }
         } else {
             if (this.hkkCounter >= 1) {
@@ -139,20 +147,34 @@ class CornerCleaning extends Control {
         this.cornersProcessed++
         this.processedSide = processedSide
         this.timeFromLastProcessedCorner = 0
-
+        if (this.cornersProcessed === 3) this.window.currentSide = "second"
+        this.updateCornersState()
+        this.writeToLogs(EVENTS[1])
         // this.addToReport()
         let snapshot = new Snapshot(this.camera.snapshot.buffer)
+        await snapshot.drawEvent(`${this.cornersProcessed} corner processed`)
+        await snapshot.drawCornersState(this.window.bbox, this.cornersState, this.window.currentSide)
+        if (this.isLocalDebug) {
+            isExists("debug")
+            snapshot.saveTo(`debug/${this.cornersProcessed}.jpeg`)
+        }
         this.photosForReport = [snapshot, ...this.photosForReport]
-        
-        this.writeToLogs(EVENTS[1])
+    }
+    updateCornersState() {
+        let i = null
+        switch (this.window.currentSide) {
+            case "first":
+                i = this.processedSide === "left" ? 0 : 1
+                break
+            case "second":
+                i = this.processedSide === "left" ? 2 : 3
+                break
+        }
+        this.cornersState[i] = true
     }
 
 
     // 2D
-    withinWorkspace(bbox) { // refactor[2D]: rect in another rect
-        const [x, y] = bbox
-        return x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1] ? true : false
-    }
     /**
      * @returns {"left" | "right"}
      */
@@ -163,11 +185,32 @@ class CornerCleaning extends Control {
                 const diffX = operationOrigin[0] - this.window.edgeCorners[0][0]
                 const halfWindowWidth = (this.window.edgeCorners[1][0] - this.window.edgeCorners[0][0])/2
                 const side = diffX < halfWindowWidth ? "left" : "right"
-                return side    
+                return side
             }
         } else {
             return "right"
         }
+    }
+    isOperationOnWindow(operationBbox, windowBbox) {
+        const operationRect = this.convertBboxToRect(operationBbox)
+        const windowRect = this.convertBboxToRect(windowBbox)
+        return this.rectanglesIntersect(operationRect, windowRect)
+    }
+    convertBboxToRect(bbox) {
+        const [x, y, width, height] = bbox
+        return [x, y, x + width, y + height]
+    }
+    /**
+     * @returns {boolean}
+     */
+    rectanglesIntersect(rectA, rectB) {
+        const [minAx, minAy, maxAx, maxAy] = rectA
+        const [minBx,  minBy,  maxBx,  maxBy] = rectB
+        return maxAx >= minBx && minAx <= maxBx && minAy <= maxBy && maxAy >= minBy
+    }
+    withinWorkspace(bbox) { // refactor[2D]: rect in another rect
+        const [x, y, width, height] = bbox
+        return x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1] ? true : false
     }
 
     writeToLogs(event, showAtConsole = true) {
@@ -181,8 +224,8 @@ class CornerCleaning extends Control {
     static getVersion() {
         return {
             name: "Operation Control",
-            version: "v0.3.1",
-            date: '05.25.2023',
+            version: "v1.0.0-rc.1",
+            date: '06.06.2023',
             description: 'Designed to ensure that the necessary number of operations are executed while cleaning seams during production.' +
                 ' This type of control helps to streamline the process and prevent any errors or omissions that could lead to costly production delays. ',
         }

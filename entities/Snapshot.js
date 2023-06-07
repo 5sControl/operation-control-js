@@ -101,19 +101,37 @@ class Snapshot {
     }
 
 
-    async drawPoint(point) {
+    async drawPoint(point, isCornerState = false, cornerState) {
         if (!this.ctx) this.createCtx()
-
         const [x, y] = point
-        this.ctx.beginPath()
-        this.ctx.arc(x, y, 10, 0, 2 * Math.PI)
-        this.ctx.fillStyle = "yellow"
-        this.ctx.fill()
-        this.ctx.lineWidth = 5
-        this.ctx.strokeStyle = "red"
-        this.ctx.stroke()
-
+        if (isCornerState) {          
+            this.ctx.beginPath()
+            this.ctx.arc(x, y, 20, 0, 2 * Math.PI)
+            this.ctx.fillStyle = cornerState ? "green" : "red"
+            this.ctx.fill()
+        } else {            
+            this.ctx.beginPath()
+            this.ctx.arc(x, y, 10, 0, 2 * Math.PI)
+            this.ctx.fillStyle = "yellow"
+            this.ctx.fill()
+            this.ctx.lineWidth = 5
+            this.ctx.strokeStyle = "red"
+            this.ctx.stroke()
+        }
         this.buffer = await this.canvas.encode('jpeg', 100)
+    }
+
+    async drawCornersState(bbox, state, side) {
+        if (!this.ctx) this.createCtx()
+        const [x, y, width, height] = bbox
+        const p1 = [x, y+height]
+        const p2 = [x+width, y+height]
+        const p3 = [x, y]
+        const p4 = [x+width, y]
+        let points = []
+        points = side === "first" ? [p1,p2,p3,p4] : [p3,p4,p1,p2]
+        points.forEach(async (point, i) => await this.drawPoint(point, true, state[i]))
+        this.buffer = await this.canvas.encode('jpeg', 50)
     }
 
     async drawThreshold(isHorizontal, coord) {
@@ -136,21 +154,17 @@ class Snapshot {
 
     async drawEvent(text) {
         if (!this.ctx) this.createCtx()
-
         this.ctx.font = "bold 48px Arial"
-        this.ctx.fillStyle = "red"
+        this.ctx.fillStyle = "white"
         this.ctx.fillText(`${text}`, 200, 1000)
-
         this.buffer = await this.canvas.encode('jpeg', 50)
     }
 
     async drawLog(info) {
         if (!this.ctx) this.createCtx()
-
         this.ctx.font = "bold 24px Arial"
         this.ctx.fillStyle = "white"
         this.ctx.fillText(`${info}`, 200, 1040)
-
         this.buffer = await this.canvas.encode('jpeg', 50)
     }
 

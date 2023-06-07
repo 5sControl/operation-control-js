@@ -1,4 +1,4 @@
-const {cutString} = require('../utils/')
+const {cutString, cutRegionFromBlob} = require('../utils/')
 const ModelWorker = require('../workers/ModelWorker')
 const Snapshot = require('./Snapshot')
 const Report = require('./Report')
@@ -49,9 +49,10 @@ class Control {
     async loadModels() {
         if (!this.model) {
             console.time(`${this.controlType} model load`)
+            let modelPath = ["idle", "machine", 'min_max'].includes(this.controlType) ? MODELS_PATH["standart"] : MODELS_PATH[this.algorithmName]
             this.model = {
-                w: new ModelWorker("wn"),
-                o: new ModelWorker("hkk")
+                w: new ModelWorker("ww"),
+                o: new ModelWorker("wo")
             }
             await this.getWorkersPredictions([this.model.w, this.model.o])
             console.timeEnd(`${this.controlType} model load`)
@@ -78,7 +79,6 @@ class Control {
                     w: result_w,
                     o: result_o
                 }
-
                 const now = Date.now()
                 console.log(`${this.controlType} model detection ${now - prev}ms`)
             } catch (error) {
@@ -93,11 +93,23 @@ class Control {
 
     async getWorkersPredictions(workers) {
         if (!this.camera.snapshot.buffer) return
-        let execs = []
-        for (const worker of workers) {
-            execs.push(worker.exec(this.camera.snapshot.buffer))
+        const wnRes = await workers[0].exec(this.camera.snapshot.buffer)
+        let woRes = []
+        let worker = wnRes.find(d => d.class === 'worker')
+        if (worker) {
+            const workerBlob = await cutRegionFromBlob(this.camera.snapshot.buffer, this.camera.resolution, worker.bbox)
+            woRes = await workers[1].exec(workerBlob)
+            const OFFSET_X = worker.x
+            const OFFSET_Y = worker.y
+            woRes = woRes.map(d => {
+                d.x = d.x + OFFSET_X
+                d.y = d.y + OFFSET_Y
+                d.bbox[0] = d.x
+                d.bbox[1] = d.y
+                return d
+            })
         }
-        return await Promise.all(execs)
+        return [wnRes, woRes]
     }
 
     update() {

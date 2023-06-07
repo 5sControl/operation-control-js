@@ -4,8 +4,8 @@ const tf = require('@tensorflow/tfjs-node')
 const COCO_LABELS = require('./coco-labels')
 const MODELS = {
     './yolov8m/model.json': COCO_LABELS,
-    './corner-cleaning/wn/model.json': ["window", "worker"],
-    './corner-cleaning/hkk/model.json': ["hkk", "various"]
+    './corner-cleaning/ww/model.json': ["window", "worker"],
+    './corner-cleaning/wo/model.json': ["hkk", "various"]
 }
 
 class YOLOv8 {
@@ -98,7 +98,7 @@ class YOLOv8 {
         
             let [y1, x1, y2, x2] = boxes_data.slice(i * 4, (i + 1) * 4)
 
-            const ratio = this.imageWidth / 640
+            const ratio = this.imageWidth / this.model.inputShape[1]
             x1 *= ratio
             x2 *= ratio
             y1 *= ratio

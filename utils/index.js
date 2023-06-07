@@ -1,4 +1,5 @@
 const {accessSync, mkdirSync} = require('fs')
+const {createCanvas, Image} = require('@napi-rs/canvas')
 
 function isExists(dir) {
     try {
@@ -107,5 +108,27 @@ const parseRTSPuri = (rtspUri) => {
         return {hostname, username, password}
     }
 
+/**
+ * @returns {Blob}
+ */
+async function cutRegionFromBlob(blob, sourceResolution, region) {
+    
+    const [cHeight, cWidth] = sourceResolution
+    let canvas = createCanvas(cWidth, cHeight)
+    let ctx = canvas.getContext('2d')
+    const image = new Image()
+    image.src = blob
+    ctx.drawImage(image, 0, 0)
 
-module.exports = {isExists, cutString, formatDate, arrayBufferToBuffer, bBox, djangoDate, randomInt, parseRTSPuri}
+    const [x, y, width, height] = region
+    const OFFSET = 20
+    let cuttedWorker = ctx.getImageData(x - OFFSET, y - OFFSET, width + OFFSET, height + OFFSET)
+
+    let newCan = createCanvas(width + OFFSET, height + OFFSET)
+    let newCtx = newCan.getContext('2d')
+    newCtx.putImageData(cuttedWorker, 0, 0)
+    const croppedBlob = await newCan.encode('jpeg', 90)
+    return croppedBlob
+}
+
+module.exports = {isExists, cutString, formatDate, arrayBufferToBuffer, bBox, djangoDate, randomInt, parseRTSPuri, cutRegionFromBlob}
