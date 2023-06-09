@@ -80,6 +80,7 @@ class CornerCleaning extends Control {
         this.operationId = +new Date()
         this.startTracking = djangoDate(new Date())
         this.isBeginTimer = 0
+        this.window.currentSide = "first"
         this.writeToLogs(EVENTS[0])
     }
     async end() {
@@ -156,7 +157,8 @@ class CornerCleaning extends Control {
         await snapshot.drawCornersState(this.window.bbox, this.cornersState, this.window.currentSide)
         if (this.isLocalDebug) {
             isExists("debug")
-            snapshot.saveTo(`debug/${this.cornersProcessed}.jpeg`)
+            isExists(`debug/${this.operationId}`)
+            snapshot.saveTo(`debug//${this.operationId}/${this.cornersProcessed}.jpeg`)
         }
         this.photosForReport = [snapshot, ...this.photosForReport]
     }
