@@ -156,7 +156,7 @@ class CornerCleaning extends Control {
             isExists(`debug/${this.operationId}`)
             snapshot.saveTo(`debug//${this.operationId}/${this.cornersProcessed}.jpeg`)
         }
-        this.photosForReport = [snapshot, ...this.photosForReport]
+        this.photosForReport = [...this.photosForReport, snapshot]
     }
     updateCornersState() {
         let i = null
