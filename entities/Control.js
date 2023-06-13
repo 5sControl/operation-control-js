@@ -94,9 +94,8 @@ class Control {
     async getWorkersPredictions(workers) {
         if (!this.camera.snapshot.buffer) return
         const wnRes = await workers[0].exec(this.camera.snapshot.buffer)
-        console.log()
         let woRes = []
-        let worker = wnRes.find(d => d.class === 'worker')
+        let worker = wnRes?.find(d => d.class === 'worker')
         if (worker) {
             const workerBlob = await cutRegionFromBlob(this.camera.snapshot.buffer, this.camera.resolution, worker.bbox)
             woRes = await workers[1].exec(workerBlob)
