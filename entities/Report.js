@@ -20,8 +20,8 @@ class Report {
         this.json = {
             "algorithm": controlType,
             "camera": hostname,
-            "start_tracking": isOperation ? controlPayload.startTracking : photos[0].date,
-            "stop_tracking": isOperation ? controlPayload.stopTracking : photos[photos.length - 1].date,
+            "start_tracking": photos[0].date,
+            "stop_tracking": photos[photos.length - 1].date,
             "photos": photos,
             "violation_found": isOperation ? potentialReports.length !== 4 : true,
             "extra": []
