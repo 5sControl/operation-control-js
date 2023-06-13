@@ -106,7 +106,7 @@ class Snapshot {
         const [x, y] = point
         if (isCornerState) {          
             this.ctx.beginPath()
-            this.ctx.arc(x, y, 20, 0, 2 * Math.PI)
+            this.ctx.arc(x, y, 30, 0, 2 * Math.PI)
             this.ctx.fillStyle = cornerState ? "green" : "red"
             this.ctx.fill()
         } else {            
@@ -130,7 +130,9 @@ class Snapshot {
         const p4 = [x+width, y]
         let points = []
         points = side === "first" ? [p1,p2,p3,p4] : [p3,p4,p1,p2]
-        points.forEach(async (point, i) => await this.drawPoint(point, true, state[i]))
+        let promises = []
+        points.forEach(async (point, i) => promises.push(this.drawPoint(point, true, state[i])))
+        await Promise.all(promises)
         this.buffer = await this.canvas.encode('jpeg', 50)
     }
 
