@@ -23,12 +23,13 @@ class Report {
             "start_tracking": isOperation ? controlPayload.startTracking : photos[0].date,
             "stop_tracking": isOperation ? controlPayload.stopTracking : photos[photos.length - 1].date,
             "photos": photos,
-            "violation_found": isOperation ? potentialReports.length < 4 : true,
+            "violation_found": isOperation ? potentialReports.length !== 4 : true,
             "extra": []
         }
-        if (isOperation) this.json.extra.payload = controlPayload
-        if (controlPayload?.extra) {
-            this.json.extra = controlPayload.extra
+        if (isOperation) {
+            this.json.extra = controlPayload
+        } else {
+            if (controlPayload?.extra) this.json.extra = controlPayload.extra
         }
 
     }
