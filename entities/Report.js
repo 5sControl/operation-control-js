@@ -35,7 +35,7 @@ class Report {
     }
     send() {
         const body = JSON.stringify(this.json)
-        console.log("Report: ", this.endpoint, body)
+        console.log("Report: ", this.endpoint, JSON.parse(body, null, 4))
         fetch(this.endpoint, {
             method: "POST",
             headers: {
@@ -44,7 +44,7 @@ class Report {
             body
         })
         .catch(err => {
-            console.log(err.code)
+            console.log("error send", err.code)
         })
     }
 }

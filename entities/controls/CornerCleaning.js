@@ -82,6 +82,7 @@ class CornerCleaning extends Control {
         this.isBeginTimer = 0
         this.window.currentSide = "first"
         this.writeToLogs(EVENTS[0])
+        this.addToReport(EVENTS[0])
     }
     async end() {
         this.operationId = null
@@ -93,6 +94,7 @@ class CornerCleaning extends Control {
         this.hkkLast = null
 
         this.writeToLogs(EVENTS[EVENTS.length - 1])
+        await this.addToReport(EVENTS[EVENTS.length - 1])
 
         // operation.sendToReports
         this.sendReport({ cornersProcessed: this.cornersProcessed })
@@ -147,16 +149,13 @@ class CornerCleaning extends Control {
         if (this.cornersProcessed === 3) this.window.currentSide = "second"
         this.updateCornersState()
         this.writeToLogs(EVENTS[1])
-        // this.addToReport()
-        let snapshot = new Snapshot(this.camera.snapshot.buffer)
-        await snapshot.drawEvent(`${this.cornersProcessed} corner processed`)
-        await snapshot.drawCornersState(this.window.bbox, this.cornersState, this.window.currentSide)
+        this.addToReport(`${this.cornersProcessed} corner processed`, true)
         if (this.isLocalDebug) {
             isExists("debug")
             isExists(`debug/${this.operationId}`)
-            snapshot.saveTo(`debug//${this.operationId}/${this.cornersProcessed}.jpeg`)
+            let snapshot = new Snapshot(this.camera.snapshot.buffer)
+            snapshot.saveTo(`debug/${this.operationId}/${this.cornersProcessed}.jpeg`)
         }
-        this.photosForReport = [...this.photosForReport, snapshot]
     }
     updateCornersState() {
         let i = null
@@ -170,7 +169,13 @@ class CornerCleaning extends Control {
         }
         this.cornersState[i] = true
     }
-
+    async addToReport(event, isDrawCornersState = false) {
+        let snapshot = new Snapshot(this.camera.snapshot.buffer)
+        let promises = [snapshot.drawEvent(event)]
+        if (isDrawCornersState) promises.push(snapshot.drawCornersState(this.window.bbox, this.cornersState, this.window.currentSide))
+        await Promise.all(promises)
+        this.photosForReport = [...this.photosForReport, snapshot]
+    }
 
     // 2D
     /**
