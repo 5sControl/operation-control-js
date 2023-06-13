@@ -28,22 +28,12 @@ class Control {
     photosForReport = []
     extra
 
-    _version = "1.0.0"
-
     constructor(camera, algorithm, extra) {
         this.camera = camera
         this.algorithmName = algorithm
         this.controlType = cutString(algorithm, 0, "_control")
         this.debugColor = CONSOLE_COLORS[this.controlType]
         this.extra = extra
-    }
-
-    setVersion(v) {
-        this._version = v
-    }
-
-    getVersion() {
-        return this._version
     }
 
     async loadModels() {

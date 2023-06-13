@@ -40,7 +40,6 @@ class CornerCleaning extends Control {
 
     constructor(...args) {
         super(...args)
-        this.setVersion("v1.0.0-rc.1")
     }
     async check() {
         if (this.camera.isVideoStreamOnPause()) return
