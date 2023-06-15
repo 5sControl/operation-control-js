@@ -96,7 +96,11 @@ class CornerCleaning extends Control {
         await this.addToReport(EVENTS[EVENTS.length - 1])
 
         // operation.sendToReports
-        this.sendReport({ cornersProcessed: this.cornersProcessed })
+        this.sendReport({ 
+            cornersProcessed: this.cornersProcessed,
+            startTracking: this.startTracking,
+            stopTracking: this.stopTracking
+        })
         this.cornersProcessed = 0
         this.cornersState = [false, false, false, false]
         this.startTracking = null
