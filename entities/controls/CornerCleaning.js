@@ -54,7 +54,7 @@ class CornerCleaning extends Control {
         for (const detection of this.isAnyDetections()) detectClasses.add(detection.class)
 
         // update this.window and this.worker
-        const window = this.predictions.w.find(detection => detection.class === "window" && detection.score > 0.5)
+        const window = this.predictions.w?.find(detection => detection.class === "window" && detection.score > 0.5)
         if (window) {
             this.window.bbox = window.bbox
             const [x, y, width, height] = this.window.bbox

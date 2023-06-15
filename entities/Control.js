@@ -1,4 +1,5 @@
-const {cutString, cutRegionFromBlob} = require('../utils/')
+const fs = require('fs')
+const {cutString, cutRegionFromBlob, djangoDate} = require('../utils/')
 const ModelWorker = require('../workers/ModelWorker')
 const Snapshot = require('./Snapshot')
 const Report = require('./Report')
@@ -61,6 +62,10 @@ class Control {
     async getPredictions() {
         try {
             if (!this.camera.snapshot.buffer) return
+            if (this.camera.snapshot.buffer.length < 1000) {
+                fs.writeFile('operation_control_log.txt', `${djangoDate(new Date())}: buffer length is ${this.camera.snapshot.buffer.length} \n`, { flag: 'a+' }, err => {if (err) console.log("log not write", err)})
+                return
+            }
             this.predictions = null
             try {
                 const prev = Date.now()
@@ -74,7 +79,7 @@ class Control {
             } catch (error) {
                 console.log(error, 'setInterval error')
             }
-            if (!this.predictions) return
+            if (!this.predictions.w || !this.predictions.o) return
             this.check()
         } catch (e) {
             console.log(e, 'e')
@@ -132,7 +137,7 @@ class Control {
                 }
             }
         } catch (error) {
-            console.log(error)
+            console.log("isAnyDetections", error)
         }
         return detection
     }
