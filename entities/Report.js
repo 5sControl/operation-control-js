@@ -40,6 +40,7 @@ class Report {
         .catch(err => {
             console.log("error send", err.code)
         })
+        fs.writeFile('operation_control_log.txt', body, { flag: 'a+' }, err => console.log(err))
     }
 }
 
