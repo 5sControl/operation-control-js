@@ -1,5 +1,5 @@
 const fs = require('fs')
-const {cutString, cutRegionFromBlob, djangoDate} = require('../utils/')
+const {cutString, cutRegionFromBlob, djangoDate, isExists} = require('../utils/')
 const ModelWorker = require('../workers/ModelWorker')
 const Snapshot = require('./Snapshot')
 const Report = require('./Report')
@@ -57,13 +57,16 @@ class Control {
             console.log(this.debugColor, `${this.controlType} control started`)
             return this.timer
         }
+        // checkDirs
+        isExists("images")
+        isExists("images/debug")
     }
 
     async getPredictions() {
         try {
             if (!this.camera.snapshot.buffer) return
             if (this.camera.snapshot.buffer.length < 1000) {
-                fs.writeFile('operation_control_log.txt', `${djangoDate(new Date())}: buffer length is ${this.camera.snapshot.buffer.length} \n`, { flag: 'a+' }, err => {if (err) console.log("log not write", err)})
+                fs.writeFile('images/debug/operation_control_log.txt', `${djangoDate(new Date())}: buffer length is ${this.camera.snapshot.buffer.length} \n`, { flag: 'a+' }, err => {if (err) console.log("log not write", err)})
                 return
             }
             this.predictions = null
