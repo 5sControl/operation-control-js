@@ -4,7 +4,6 @@ const crypto = require('crypto')
 class Report {
     constructor(serverUrl, hostname, controlType, potentialReports, controlPayload) {
 
-        const isOperation = controlType === "operation_control" ? true : false
         this.endpoint = `${serverUrl}:80/api/reports/report-with-photos/`
         let photos = []
         for (const {buffer, createdAt} of potentialReports) {
@@ -23,19 +22,14 @@ class Report {
             "start_tracking": photos[0].date,
             "stop_tracking": photos[photos.length - 1].date,
             "photos": photos,
-            "violation_found": isOperation ? potentialReports.length !== 4 : true,
-            "extra": []
-        }
-        if (isOperation) {
-            this.json.extra = controlPayload
-        } else {
-            if (controlPayload?.extra) this.json.extra = controlPayload.extra
+            "violation_found": controlPayload.cornersProcessed !== 4,
+            "extra": controlPayload
         }
 
     }
     send() {
         const body = JSON.stringify(this.json)
-        console.log("Report: ", this.endpoint, JSON.parse(body, null, 4))
+        console.log("Report: ", this.json)
         fetch(this.endpoint, {
             method: "POST",
             headers: {
