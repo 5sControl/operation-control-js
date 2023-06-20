@@ -99,7 +99,8 @@ class CornerCleaning extends Control {
         this.sendReport({ 
             cornersProcessed: this.cornersProcessed,
             startTracking: this.startTracking,
-            stopTracking: this.stopTracking
+            stopTracking: this.stopTracking,
+            operationType: this.cornersProcessed === 0 ? "unknown" : "cleaning corners"
         })
         this.cornersProcessed = 0
         this.cornersState = [false, false, false, false]
