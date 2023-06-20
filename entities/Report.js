@@ -35,6 +35,8 @@ class Report {
             headers: { 'Content-Type': 'application/json;charset=utf-8' },
             body
         })
+        .then(r => r.text())
+        .then(response => { console.log(response) })
         .catch(err => {
             console.log("error send", err.code)
         })
