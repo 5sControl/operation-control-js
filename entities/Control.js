@@ -59,7 +59,6 @@ class Control {
         }
         // checkDirs
         isExists("images")
-        isExists("images/debug")
         isExists("debug/")
         isExists("debug/operation-control")
     }

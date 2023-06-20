@@ -32,15 +32,14 @@ class Report {
         console.log("Report: ", this.json)
         fetch(this.endpoint, {
             method: "POST",
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
+            headers: { 'Content-Type': 'application/json;charset=utf-8' },
             body
         })
         .catch(err => {
             console.log("error send", err.code)
         })
-        fs.writeFile('debug/operation-control/log.txt', `${body} \n`, { flag: 'a+' }, err => { if (err) console.log("report not write to log", err)})
+        const log = `${this.json.extra.startTracking}. ${this.json.extra.cornersProcessed} \n${body} \n\n`
+        fs.writeFile('debug/operation-control/log.txt', log, { flag: 'a+' }, err => { if (err) console.log("report not write to log", err)})
     }
 }
 
