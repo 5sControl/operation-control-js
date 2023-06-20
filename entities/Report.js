@@ -40,7 +40,7 @@ class Report {
         .catch(err => {
             console.log("error send", err.code)
         })
-        fs.writeFile('images/debug/operation_control_log.txt', `${body} \n`, { flag: 'a+' }, err => { if (err) console.log("report not write to log", err)})
+        fs.writeFile('debug/operation-control/log.txt', `${body} \n`, { flag: 'a+' }, err => { if (err) console.log("report not write to log", err)})
     }
 }
 
