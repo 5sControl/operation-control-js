@@ -231,8 +231,8 @@ class CornerCleaning extends Control {
     static getVersion() {
         return {
             name: "Operation Control",
-            version: "v1.0.0-rc.2",
-            date: '14.06.2023',
+            version: "v1.0.0-rc.3",
+            date: '21.06.2023',
             description: 'Designed to ensure that the necessary number of operations are executed while cleaning seams during production.' +
                 ' This type of control helps to streamline the process and prevent any errors or omissions that could lead to costly production delays. ',
         }
