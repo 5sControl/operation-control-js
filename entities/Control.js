@@ -59,14 +59,15 @@ class Control {
         }
         // checkDirs
         isExists("images")
-        isExists("images/debug")
+        isExists("debug/")
+        isExists("debug/operation-control")
     }
 
     async getPredictions() {
         try {
             if (!this.camera.snapshot.buffer) return
             if (this.camera.snapshot.buffer.length < 1000) {
-                fs.writeFile('images/debug/operation_control_log.txt', `${djangoDate(new Date())}: buffer length is ${this.camera.snapshot.buffer.length} \n`, { flag: 'a+' }, err => {if (err) console.log("log not write", err)})
+                fs.writeFile('debug/operation-control/log.txt', `${djangoDate(new Date())}: buffer length is ${this.camera.snapshot.buffer.length} \n`, { flag: 'a+' }, err => {if (err) console.log("log not write", err)})
                 return
             }
             this.predictions = null

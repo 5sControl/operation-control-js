@@ -104,11 +104,14 @@ class Snapshot {
     async drawPoint(point, isCornerState = false, cornerState) {
         if (!this.ctx) this.createCtx()
         const [x, y] = point
-        if (isCornerState) {          
-            this.ctx.beginPath()
-            this.ctx.arc(x, y, 30, 0, 2 * Math.PI)
-            this.ctx.fillStyle = cornerState ? "green" : "red"
-            this.ctx.fill()
+        if (isCornerState) {
+            if (cornerState) {
+                this.ctx.beginPath()
+                this.ctx.arc(x, y, 30, 0, 2 * Math.PI)
+                this.ctx.fillStyle = cornerState ? "#3AFF09" : "#E00606"
+                this.ctx.fill()
+                cornerState ? this.drawMark(x, y) : this.drawCross(x, y)
+            }
         } else {            
             this.ctx.beginPath()
             this.ctx.arc(x, y, 10, 0, 2 * Math.PI)
@@ -119,6 +122,42 @@ class Snapshot {
             this.ctx.stroke()
         }
         this.buffer = await this.canvas.encode('jpeg', 100)
+    }
+    drawCross(x, y) {
+        const box = {
+            x: x - 15,
+            y: y - 15,
+            width: x - 15 + 30,
+            height: y - 15 + 30
+        }
+        this.ctx.lineWidth = 7
+        this.ctx.strokeStyle = "white"
+        this.ctx.beginPath()
+        this.ctx.moveTo(box.x, box.y)
+        this.ctx.lineTo(box.width, box.height)
+        this.ctx.stroke()
+        this.ctx.beginPath()
+        this.ctx.moveTo(box.width, box.y)
+        this.ctx.lineTo(box.x, box.height)
+        this.ctx.stroke()
+    }
+    drawMark(x, y) {
+        const box = {
+            x: x - 15,
+            y: y - 15,
+            width: x - 15 + 30,
+            height: y - 15 + 30
+        }
+        this.ctx.lineWidth = 7
+        this.ctx.strokeStyle = "white"
+        this.ctx.beginPath()
+        this.ctx.moveTo(box.x, box.y + 17)
+        this.ctx.lineTo(box.width - 15, box.height)
+        this.ctx.stroke()
+        this.ctx.beginPath()
+        this.ctx.moveTo(box.width + 2, box.y)
+        this.ctx.lineTo(box.width - 19, box.height)
+        this.ctx.stroke()
     }
 
     async drawCornersState(bbox, state, side) {
@@ -156,15 +195,17 @@ class Snapshot {
 
     async drawEvent(text) {
         if (!this.ctx) this.createCtx()
-        this.ctx.font = "bold 48px Arial"
+        this.ctx.font = "bold 36px sans"
+        this.ctx.lineWidth = 4
+        this.ctx.strokeText(`${text}`, 49, 1029)
         this.ctx.fillStyle = "white"
-        this.ctx.fillText(`${text}`, 200, 1000)
+        this.ctx.fillText(`${text}`, 50, 1030)
         this.buffer = await this.canvas.encode('jpeg', 50)
     }
 
     async drawLog(info) {
         if (!this.ctx) this.createCtx()
-        this.ctx.font = "bold 24px Arial"
+        this.ctx.font = "bold 36px Arial"
         this.ctx.fillStyle = "white"
         this.ctx.fillText(`${info}`, 200, 1040)
         this.buffer = await this.canvas.encode('jpeg', 50)
