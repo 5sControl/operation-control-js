@@ -104,12 +104,14 @@ class Snapshot {
     async drawPoint(point, isCornerState = false, cornerState) {
         if (!this.ctx) this.createCtx()
         const [x, y] = point
-        if (isCornerState) {          
-            this.ctx.beginPath()
-            this.ctx.arc(x, y, 30, 0, 2 * Math.PI)
-            this.ctx.fillStyle = cornerState ? "#3AFF09" : "#E00606"
-            this.ctx.fill()
-            cornerState ? this.drawMark(x, y) : this.drawCross(x, y)
+        if (isCornerState) {
+            if (cornerState) {
+                this.ctx.beginPath()
+                this.ctx.arc(x, y, 30, 0, 2 * Math.PI)
+                this.ctx.fillStyle = cornerState ? "#3AFF09" : "#E00606"
+                this.ctx.fill()
+                cornerState ? this.drawMark(x, y) : this.drawCross(x, y)
+            }
         } else {            
             this.ctx.beginPath()
             this.ctx.arc(x, y, 10, 0, 2 * Math.PI)
