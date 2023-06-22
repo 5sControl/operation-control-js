@@ -27,7 +27,6 @@ class Camera {
         this.auth()
         await this.getSnapshot()
         isExists(folder)
-        // this.setResolution()
 
         const interval = setInterval(async () => {
             this.getSnapshot()
@@ -57,12 +56,6 @@ class Camera {
             console.log('code: ', error.code)
             console.log('socket: ', error.socket?.remoteAddress)
         }
-    }
-
-    setResolution() {
-        const {getSync} = require('@andreekeberg/imagedata')
-        const {width, height} = getSync(this.snapshot.buffer)
-        this.resolution = [height, width]
     }
 
     isVideoStreamOnPause() {
