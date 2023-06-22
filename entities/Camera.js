@@ -26,6 +26,8 @@ class Camera {
 
         this.auth()
         await this.getSnapshot()
+        
+        isExists("images")
         isExists(folder)
 
         const interval = setInterval(async () => {
