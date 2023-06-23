@@ -39,7 +39,10 @@ class Report {
             body
         })
         .then(r => r.text())
-        .then(response => { console.log(response) })
+        .then(response => { 
+            console.log(response)
+            fs.writeFile('debug/operation-control/log.txt', response, { flag: 'a+' }, err => { if (err) console.log("report not write to log", err)})
+        })
         .catch(err => {
             console.log("error send", err.code)
         })
