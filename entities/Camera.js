@@ -1,3 +1,4 @@
+const fs = require('fs')
 const {arrayBufferToBuffer, parseRTSPuri} = require('../utils/')
 
 class Camera {
@@ -13,13 +14,13 @@ class Camera {
     client = null
     resolution = [1080, 1920]
 
-    isDebug = false
+    isLocalDebug = false
     lastSnapshotLength = 0
 
     constructor() {
     }
 
-    async init(reqBody, isDebug = false, folder) {
+    async init(reqBody, folder) {
         this.serverUrl = reqBody["server_url"]
         this.hostname = folder.split('/')[1]
         this.snapshot.uri = reqBody["camera_url"]
@@ -48,9 +49,13 @@ class Camera {
 
     async getSnapshot() {
         try {
-            const response = await this.client.fetch(this.snapshot.uri)
-            const arrayBuffer = await response.arrayBuffer()
-            this.snapshot.buffer = arrayBufferToBuffer(arrayBuffer)
+            if (this.isLocalDebug) {
+                this.snapshot.buffer = fs.readFileSync('snapshot.jpeg')
+            } else {                
+                const response = await this.client.fetch(this.snapshot.uri)
+                const arrayBuffer = await response.arrayBuffer()
+                this.snapshot.buffer = arrayBufferToBuffer(arrayBuffer)
+            }
         } catch (error) {
             console.log('code: ', error.code)
             console.log('socket: ', error.socket?.remoteAddress)

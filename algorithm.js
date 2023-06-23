@@ -1,4 +1,4 @@
-const fs = require('fs/promises')
+const fs = require('fs')
 const {djangoDate, isExists} = require('./utils')
 
 const Camera = require('./entities/Camera')
@@ -14,10 +14,9 @@ isExists(folder)
 isExists("debug/")
 isExists("debug/operation-control")
 
-
 console.time('writeFile')
 fs.writeFile('debug/operation-control/log.txt', `
-Container started at ${djangoDate}:
+Container started at ${djangoDate(new Date())}:
 camera_url: ${camera_url}
 folder: ${folder}
 server_url: ${server_url}
@@ -29,7 +28,7 @@ console.timeEnd('writeFile')
 const run = async () => {
     const camera = new Camera()
     const reqBody = {algorithm: 'operation_control', camera_url, server_url, extra: []}
-    const cameraInterval = await camera.init(reqBody, false, folder)
+    const cameraInterval = await camera.init(reqBody, folder)
     const createdAlgorithm = new CornerCleaning(cameraInterval.camera, 'operation_control', [])
     await createdAlgorithm.start(cameraInterval.camera)
 }
