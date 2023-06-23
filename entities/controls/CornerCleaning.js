@@ -155,7 +155,6 @@ class CornerCleaning extends Control {
         this.writeToLogs(EVENTS[1])
         this.addToReport(`${this.cornersProcessed} corner processed`, true)
         if (this.isLocalDebug) {
-            isExists("debug")
             isExists(`debug/${this.operationId}`)
             let snapshot = new Snapshot(this.camera.snapshot.buffer)
             snapshot.saveTo(`debug/${this.operationId}/${this.cornersProcessed}.jpeg`)

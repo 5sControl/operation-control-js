@@ -1,4 +1,4 @@
-const {isExists, arrayBufferToBuffer, parseRTSPuri} = require('../utils/')
+const {arrayBufferToBuffer, parseRTSPuri} = require('../utils/')
 
 class Camera {
 
@@ -27,9 +27,6 @@ class Camera {
         this.auth()
         await this.getSnapshot()
         
-        isExists("images")
-        isExists(folder)
-
         const interval = setInterval(async () => {
             this.getSnapshot()
         }, 1000)

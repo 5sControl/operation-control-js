@@ -1,5 +1,5 @@
 const fs = require('fs/promises')
-const {djangoDate} = require('./utils')
+const {djangoDate, isExists} = require('./utils')
 
 const Camera = require('./entities/Camera')
 const CornerCleaning = require("./entities/controls/CornerCleaning")
@@ -7,6 +7,13 @@ const CornerCleaning = require("./entities/controls/CornerCleaning")
 const camera_url = process.env.camera_url || "http://192.168.1.110:3456/onvif-http/snapshot?Profile_1"
 const folder = process.env.folder || "images/192.168.1.110"
 const server_url = process.env.server_url || "http://192.168.1.110"
+
+// checkDirs
+isExists("images")
+isExists(folder)
+isExists("debug/")
+isExists("debug/operation-control")
+
 
 console.time('writeFile')
 fs.writeFile('debug/operation-control/log.txt', `

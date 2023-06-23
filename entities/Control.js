@@ -1,5 +1,5 @@
 const fs = require('fs')
-const {cutString, cutRegionFromBlob, djangoDate, isExists} = require('../utils/')
+const {cutString, cutRegionFromBlob, djangoDate} = require('../utils/')
 const ModelWorker = require('../workers/ModelWorker')
 const Snapshot = require('./Snapshot')
 const Report = require('./Report')
@@ -57,10 +57,6 @@ class Control {
             console.log(this.debugColor, `${this.controlType} control started`)
             return this.timer
         }
-        // checkDirs
-        isExists("images")
-        isExists("debug/")
-        isExists("debug/operation-control")
     }
 
     async getPredictions() {
