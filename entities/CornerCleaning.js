@@ -1,6 +1,6 @@
-const {djangoDate, bBox, isExists} = require('../../utils')
-const {Control} = require('../Control')
-const Snapshot = require('../Snapshot')
+const {djangoDate, bBox, isExists} = require('../utils')
+const {Control} = require('./Control')
+const Snapshot = require('./Snapshot')
 
 const EVENTS = [
     "Begin of operation",

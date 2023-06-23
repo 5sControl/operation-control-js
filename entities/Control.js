@@ -1,7 +1,6 @@
 const fs = require('fs')
 const {cutString, cutRegionFromBlob, djangoDate} = require('../utils/')
 const ModelWorker = require('../workers/ModelWorker')
-const Snapshot = require('./Snapshot')
 const Report = require('./Report')
 const setColor = colorCode => `\x1b[${colorCode}m%s\x1b[0m`
 let CONSOLE_COLORS = {
@@ -24,7 +23,6 @@ class Control {
 
     // options
     CHECK_TIME = 1000
-    allowedTime = 10 // seconds
 
     photosForReport = []
     extra
@@ -107,17 +105,7 @@ class Control {
         return [wnRes, woRes]
     }
 
-    update() {
-    }
-
-    async detect() {
-    }
-
     check() {
-    }
-
-    isPeopleOnFrame() {
-        return !!this.predictions.length
     }
 
     /**
@@ -140,16 +128,6 @@ class Control {
             console.log("isAnyDetections", error)
         }
         return detection
-    }
-
-    erasePhotosIfArrayIsEmpty(array) {
-        array.length > 0 ?
-            this.photosForReport = [...this.photosForReport, new Snapshot(this.camera.snapshot.buffer)]
-            : this.photosForReport = []
-    }
-
-    sendReportIfPhotosEnough() {
-        if (this.photosForReport.length === this.allowedTime) this.sendReport()
     }
 
     sendReport(controlPayload) {
