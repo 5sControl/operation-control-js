@@ -1,4 +1,5 @@
 const fs = require('fs')
+const {logger} = require("../Logger")
 const {cutString, cutRegionFromBlob, djangoDate} = require('../utils/')
 const ModelWorker = require('../workers/ModelWorker')
 const Report = require('./Report')
@@ -61,7 +62,7 @@ class Control {
         try {
             if (!this.camera.snapshot.buffer) return
             if (this.camera.snapshot.buffer.length < 1000) {
-                fs.writeFile('debug/operation-control/log.txt', `${djangoDate(new Date())}: buffer length is ${this.camera.snapshot.buffer.length} \n`, { flag: 'a+' }, err => {if (err) console.log("log not write", err)})
+                logger("translation broken", `buffer length is ${this.camera.snapshot.buffer.length} \n`)
                 return
             }
             this.predictions = null

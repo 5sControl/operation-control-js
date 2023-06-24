@@ -1,10 +1,11 @@
 const {djangoDate, bBox, isExists} = require('../utils')
 const {Control} = require('./Control')
 const Snapshot = require('./Snapshot')
+const {logger} = require("../Logger")
 
 const EVENTS = [
     "Begin of operation",
-    "Corner processed by hkk",
+    "Corner processed",
     "End of operation"
 ]
 
@@ -124,7 +125,7 @@ class CornerCleaning extends Control {
             }
         } else {
             if (this.hkkCounter >= 1) {
-                this.writeToLogs("Operation found", false) // Найдена операция
+                this.writeToLogs("Action performed", false) // Найдена операция
                 const currentSide = this.whatSide()
                 if (this.processedSide === null) {
                     this.writeToLogs("No side has been counted yet", false) // Никакой стороны ещё не было засчитано
@@ -219,9 +220,9 @@ class CornerCleaning extends Control {
         return x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1] ? true : false
     }
 
-    writeToLogs(event, showAtConsole = true) {
+    writeToLogs(event) {
         this.logs.push(event)
-        if (showAtConsole) console.log(this.debugColor, event)
+        logger(event)
     }
     cleanLogs() {
         this.logs = []

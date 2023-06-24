@@ -1,5 +1,5 @@
-const fs = require('fs')
 const {djangoDate, isExists} = require('./utils')
+const {logger} = require("../Logger")
 
 const Camera = require('./entities/Camera')
 const CornerCleaning = require("./entities/controls/CornerCleaning")
@@ -14,16 +14,12 @@ isExists(folder)
 isExists("debug/")
 isExists("debug/operation-control")
 
-console.time('writeFile')
-fs.writeFile('debug/operation-control/log.txt', `
+logger("container started",`
 Container started at ${djangoDate(new Date())}:
 camera_url: ${camera_url}
 folder: ${folder}
 server_url: ${server_url}
-`, { flag: 'a+' }, err => { 
-    if (err) console.log("report not write to log", err)
-})
-console.timeEnd('writeFile')
+`)
 
 const run = async () => {
     const camera = new Camera()
@@ -31,5 +27,6 @@ const run = async () => {
     const cameraInterval = await camera.init(reqBody, folder)
     const createdAlgorithm = new CornerCleaning(cameraInterval.camera, 'operation_control', [])
     await createdAlgorithm.start(cameraInterval.camera)
+    logger("control started")
 }
 run()

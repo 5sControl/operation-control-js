@@ -1,5 +1,6 @@
 const fs = require('fs')
 const crypto = require('crypto')
+const {logger} = require("../Logger")
 
 class Report {
     constructor(serverUrl, hostname, controlType, potentialReports, controlPayload) {
@@ -31,23 +32,17 @@ class Report {
 
     }
     send() {
-        const body = JSON.stringify(this.json)
-        console.log("Report: ", this.json)
+        const body = JSON.stringify(this.json, null, 2)
         fetch(this.endpoint, {
             method: "POST",
             headers: { 'Content-Type': 'application/json;charset=utf-8' },
             body
         })
         .then(r => r.text())
-        .then(response => { 
-            console.log(response)
-            fs.writeFile('debug/operation-control/log.txt', response, { flag: 'a+' }, err => { if (err) console.log("report not write to log", err)})
-        })
-        .catch(err => {
-            console.log("error send", err.code)
-        })
-        const log = `${this.json.extra.startTracking}\ncorners: ${this.json.extra.cornersProcessed}\njson: ${body}\nimages:\n${this.imagesNames}\n\n`
-        fs.writeFile('debug/operation-control/log.txt', log, { flag: 'a+' }, err => { if (err) console.log("report not write to log", err)})
+        .then(response => { logger("server response", response) })
+        .catch(err => { logger("error report send", err.code) })
+        logger("report sended",
+        `corners: ${this.json.extra.cornersProcessed}\njson: ${body}\nimages:\n${this.imagesNames}\n\n`)
     }
 }
 
