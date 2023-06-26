@@ -1,6 +1,7 @@
 const {accessSync, mkdirSync} = require('fs')
 const {createCanvas, Image} = require('@napi-rs/canvas')
 
+// Path
 function isExists(dir) {
     try {
         accessSync(dir)
@@ -12,21 +13,26 @@ function isExists(dir) {
         }
     }
 }
-
-function cutString(str, from, to) {
-    let cuttedString = ""
-    if (from === 0) {
-        cuttedString = str.substring(0, str.lastIndexOf(to))
-    } else {
-        cuttedString = str.substring(str.indexOf(from) + 1, str.lastIndexOf(to))
+/**
+ * @param {string[]} dirs
+ * @returns {true | ReferenceError} created folders or not
+ */
+function checkDirs(dirs) {
+    try {
+        for (const dir of dirs) {
+            isExists(dir)
+        }
+        return true
+    } catch (error) {
+        return error
     }
-    return cuttedString
 }
 
+
+// Date
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0')
 }
-
 function formatDate(date) {
     return (
         [
@@ -42,7 +48,6 @@ function formatDate(date) {
         ].join('-')
     )
 }
-
 function djangoDate(date) {
     return (
         [
@@ -62,17 +67,7 @@ function djangoDate(date) {
     )
 }
 
-function isEmptyObj(obj) {
-    return obj && Object.keys(obj).length === 0 && Object.getPrototypeOf(obj) === Object.prototype
-}
-
-function arrayBufferToBuffer(arrayBuffer) {
-    const buffer = Buffer.alloc(arrayBuffer.byteLength)
-    const view = new Uint8Array(arrayBuffer)
-    for (let i = 0; i < buffer.length; ++i) buffer[i] = view[i]
-    return buffer
-}
-
+// 2D
 const bBox = {
     convert(prediction) {
         const {x, y, width, height} = prediction
@@ -87,26 +82,12 @@ const bBox = {
         }
     }
 }
-
 function pointsDistanceModule(point_1, point_2) {
     let xModule = Math.floor(Math.abs(point_1[0] - point_2[0]))
     let yModule = Math.floor(Math.abs(point_1[1] - point_2[1]))
     return [xModule, yModule]
 }
 
-const randomInt = () => {
-    const min = 1;
-    const max = 111111111111;
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-const parseRTSPuri = (rtspUri) => {
-        const cleanedUri = rtspUri.replace("rtsp://", "")
-        const username = cutString(cleanedUri, 0, ":")
-        const password = cutString(cleanedUri, ":", "@")
-        const hostname = cutString(cleanedUri, "@", "/")
-        return {hostname, username, password}
-    }
 
 /**
  * @returns {Blob}
@@ -131,4 +112,4 @@ async function cutRegionFromBlob(blob, sourceResolution, region) {
     return croppedBlob
 }
 
-module.exports = {isExists, cutString, formatDate, arrayBufferToBuffer, bBox, djangoDate, randomInt, parseRTSPuri, cutRegionFromBlob}
+module.exports = {isExists, checkDirs, formatDate, bBox, djangoDate, cutRegionFromBlob}

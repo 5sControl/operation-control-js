@@ -12,7 +12,6 @@ class Camera {
 
     constructor(camera_url) {
         this.snapshot.uri = camera_url
-        setInterval(() => this.getSnapshot(), 1000)
     }
     async getSnapshot() {
         try {

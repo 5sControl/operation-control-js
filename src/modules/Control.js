@@ -46,24 +46,21 @@ class Control {
 
     photosForReport = []
 
-    constructor() {
-
-        // checkDirs
-        isExists("images")
-        isExists(process.env.folder)
-        isExists("debug/")
-        isExists("debug/operation-control")
+    constructor() {}
+    async start(isWithTimer = true) {
 
         this.camera = new Camera(process.env.camera_url)
-    }
-    async start(isWithTimer = true) {
         await this.loadModels()
-        if (isWithTimer) setInterval(async () => await this.getPredictions(), 1000)
+
+        if (isWithTimer) setInterval(async () => {
+            await this.camera.getSnapshot()
+            await this.getPredictions()
+        }, 1000)
     }
 
     //Detector
     WORKSPACE_BOUNDARIES = [1600, 900]
-    HKK_MIN_SCORE = 0.
+    HKK_MIN_SCORE = 0.9
     model
     predictions
     async loadModels() {
@@ -155,7 +152,6 @@ class Control {
         return x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1] ? true : false
     }
 
-
     async check() {
         if (this.camera.isVideoStreamOnPause()) return
         this.cleanLogs()
@@ -211,13 +207,15 @@ class Control {
         this.writeToLogs(EVENTS[EVENTS.length - 1])
         await this.addToReport(EVENTS[EVENTS.length - 1])
 
-        // operation.sendToReports
-        this.sendReport({ 
+        const report = new Report(this.photosForReport, { 
             cornersProcessed: this.cornersProcessed,
             startTracking: this.startTracking,
             stopTracking: this.stopTracking,
             operationType: this.cornersProcessed === 0 ? "unknown" : "cleaning corners"
         })
+        report.send()
+        this.photosForReport = []
+
         this.cornersProcessed = 0
         this.cornersState = [false, false, false, false]
         this.startTracking = null
@@ -337,13 +335,6 @@ class Control {
     }
     cleanLogs() {
         this.logs = []
-    }
-
-
-    sendReport(controlPayload) {
-        const report = new Report(this.camera.serverUrl, this.camera.hostname, "operation_control", this.photosForReport, controlPayload)
-        report.send()
-        this.photosForReport = []
     }
 
 }
