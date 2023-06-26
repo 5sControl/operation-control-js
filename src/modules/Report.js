@@ -3,9 +3,9 @@ const crypto = require('crypto')
 const {logger} = require("./Logger")
 
 class Report {
-    constructor(serverUrl, hostname, controlType, potentialReports, controlPayload) {
-
-        this.endpoint = `${serverUrl}:80/api/reports/report-with-photos/`
+    constructor(controlType, potentialReports, controlPayload) {
+        const hostname = folder.split("/")[1]
+        this.endpoint = `${process.env.server_url}:80/api/reports/report-with-photos/`
         let photos = []
         this.imagesNames = []
         for (const {buffer, createdAt} of potentialReports) {
@@ -19,7 +19,6 @@ class Report {
             const fileObject = {"image": filePath, "date": createdAt}
             photos.push(fileObject)
         }
-
         this.json = {
             "algorithm": controlType,
             "camera": hostname,
@@ -29,7 +28,6 @@ class Report {
             "violation_found": controlPayload.cornersProcessed !== 4,
             "extra": controlPayload
         }
-
     }
     send() {
         const body = JSON.stringify(this.json, null, 2)
