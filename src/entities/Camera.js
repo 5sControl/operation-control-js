@@ -1,5 +1,5 @@
 const fs = require('fs')
-const {arrayBufferToBuffer, parseRTSPuri} = require('../utils/')
+const {arrayBufferToBuffer, parseRTSPuri} = require('../utils')
 
 class Camera {
 

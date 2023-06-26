@@ -3,9 +3,9 @@
   "version": "v1.0.0-rc.3",
   "date": "21.06.2023",
   "description": "Designed to ensure that the necessary number of operations are executed while cleaning seams during production. This type of control helps to streamline the process and prevent any errors or omissions that could lead to costly production delays.",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
-    "test": "export camera_url=http://192.168.1.110:3456/onvif-http/snapshot?Profile_1 && export server_url=http://192.168.1.110 && node main.js"
+    "test": "export camera_url=http://192.168.1.110:3456/onvif-http/snapshot?Profile_1 && export server_url=http://192.168.1.110 && node src/main.js"
   },
   "repository": {
     "type": "git",
