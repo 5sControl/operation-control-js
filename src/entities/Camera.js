@@ -1,5 +1,4 @@
 const fs = require('fs')
-const {arrayBufferToBuffer, parseRTSPuri} = require('../utils')
 
 class Camera {
 
@@ -25,7 +24,6 @@ class Camera {
         this.hostname = folder.split('/')[1]
         this.snapshot.uri = reqBody["camera_url"]
 
-        this.auth()
         await this.getSnapshot()
         
         const interval = setInterval(async () => {
@@ -38,23 +36,14 @@ class Camera {
         }
     }
 
-    auth() {
-        try {
-            const DigestFetch = require('../utils/digest-fetch')
-            this.client = new DigestFetch('test', 'test')
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     async getSnapshot() {
         try {
             if (this.isLocalDebug) {
                 this.snapshot.buffer = fs.readFileSync('snapshot.jpeg')
             } else {                
-                const response = await this.client.fetch(this.snapshot.uri)
-                const arrayBuffer = await response.arrayBuffer()
-                this.snapshot.buffer = arrayBufferToBuffer(arrayBuffer)
+                const response = await fetch(this.snapshot.uri)
+                console.log(response)
+                this.snapshot.buffer = response
             }
         } catch (error) {
             console.log('code: ', error.code)
