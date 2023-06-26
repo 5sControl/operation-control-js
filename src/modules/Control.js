@@ -1,9 +1,10 @@
 const {logger} = require("./Logger")
-const {djangoDate, bBox} = require('./utils')
+const {djangoDate} = require('./utils/Date')
+const {bBox} = require('./utils/2D')
 
 const Camera = require('./Camera')
 
-const {cutRegionFromBlob} = require('./utils')
+const {cutRegionFromBlob} = require('./utils/Date')
 const ModelWorker = require('./Detector/workers/ModelWorker')
 
 const Snapshot = require('./Snapshot')
@@ -151,6 +152,41 @@ class Control {
         const [x, y, width, height] = bbox
         return x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1] ? true : false
     }
+    // 2D
+    /**
+     * @returns {"left" | "right"}
+     */
+    whatSide() {
+        if (this.hkkLast.bbox !== null) {
+            const operationOrigin = bBox.getOrigin(this.hkkLast.bbox)
+            if (operationOrigin) {
+                const diffX = operationOrigin[0] - this.window.edgeCorners[0][0]
+                const halfWindowWidth = (this.window.edgeCorners[1][0] - this.window.edgeCorners[0][0])/2
+                const side = diffX < halfWindowWidth ? "left" : "right"
+                return side
+            }
+        } else {
+            return "right"
+        }
+    }
+    isOperationOnWindow(operationBbox, windowBbox) {
+        const operationRect = this.convertBboxToRect(operationBbox)
+        const windowRect = this.convertBboxToRect(windowBbox)
+        return this.rectanglesIntersect(operationRect, windowRect)
+    }
+    convertBboxToRect(bbox) {
+        const [x, y, width, height] = bbox
+        return [x, y, x + width, y + height]
+    }
+    /**
+     * @returns {boolean}
+     */
+    rectanglesIntersect(rectA, rectB) {
+        const [minAx, minAy, maxAx, maxAy] = rectA
+        const [minBx,  minBy,  maxBx,  maxBy] = rectB
+        return maxAx >= minBx && minAx <= maxBx && minAy <= maxBy && maxAy >= minBy
+    }
+
 
     async check() {
         if (this.camera.isVideoStreamOnPause()) return
@@ -158,7 +194,6 @@ class Control {
         this.status()
         if (this.startTracking) this.isCornerProcessed()
     }
-
 
     status() {
         // Control.isAnyDetections([], "set")
@@ -287,41 +322,6 @@ class Control {
         if (isDrawCornersState) promises.push(snapshot.drawCornersState(this.window.bbox, this.cornersState, this.window.currentSide))
         await Promise.all(promises)
         this.photosForReport = [...this.photosForReport, snapshot]
-    }
-
-    // 2D
-    /**
-     * @returns {"left" | "right"}
-     */
-    whatSide() {
-        if (this.hkkLast.bbox !== null) {
-            const operationOrigin = bBox.getOrigin(this.hkkLast.bbox)
-            if (operationOrigin) {
-                const diffX = operationOrigin[0] - this.window.edgeCorners[0][0]
-                const halfWindowWidth = (this.window.edgeCorners[1][0] - this.window.edgeCorners[0][0])/2
-                const side = diffX < halfWindowWidth ? "left" : "right"
-                return side
-            }
-        } else {
-            return "right"
-        }
-    }
-    isOperationOnWindow(operationBbox, windowBbox) {
-        const operationRect = this.convertBboxToRect(operationBbox)
-        const windowRect = this.convertBboxToRect(windowBbox)
-        return this.rectanglesIntersect(operationRect, windowRect)
-    }
-    convertBboxToRect(bbox) {
-        const [x, y, width, height] = bbox
-        return [x, y, x + width, y + height]
-    }
-    /**
-     * @returns {boolean}
-     */
-    rectanglesIntersect(rectA, rectB) {
-        const [minAx, minAy, maxAx, maxAy] = rectA
-        const [minBx,  minBy,  maxBx,  maxBy] = rectB
-        return maxAx >= minBx && minAx <= maxBx && minAy <= maxBy && maxAy >= minBy
     }
 
     writeToLogs(event) {
