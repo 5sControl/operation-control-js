@@ -1,8 +1,5 @@
-const {djangoDate} = require('./modules/utils/Date')
 const {logger} = require("./modules/Logger")
-logger("container started",`
-Container started at ${djangoDate(new Date())}:
-camera_url: ${process.env.camera_url}
+logger("container started",`camera_url: ${process.env.camera_url}
 folder: ${process.env.folder}
 server_url: ${process.env.server_url}
 `)
