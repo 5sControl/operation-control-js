@@ -1,34 +1,3 @@
-const {accessSync, mkdirSync} = require('fs')
-const {createCanvas, Image} = require('@napi-rs/canvas')
-
-// Path
-function isExists(dir) {
-    try {
-        accessSync(dir)
-        console.log('Dir exists')
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            mkdirSync(dir)
-            console.log(dir, "created successfully... ")
-        }
-    }
-}
-/**
- * @param {string[]} dirs
- * @returns {true | ReferenceError} created folders or not
- */
-function checkDirs(dirs) {
-    try {
-        for (const dir of dirs) {
-            isExists(dir)
-        }
-        return true
-    } catch (error) {
-        return error
-    }
-}
-
-
 // Date
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0')
@@ -89,6 +58,8 @@ function pointsDistanceModule(point_1, point_2) {
 }
 
 
+/// Canvas
+const {createCanvas, Image} = require('@napi-rs/canvas')
 /**
  * @returns {Blob}
  */
@@ -112,4 +83,4 @@ async function cutRegionFromBlob(blob, sourceResolution, region) {
     return croppedBlob
 }
 
-module.exports = {isExists, checkDirs, formatDate, bBox, djangoDate, cutRegionFromBlob}
+module.exports = { formatDate, bBox, djangoDate, cutRegionFromBlob }

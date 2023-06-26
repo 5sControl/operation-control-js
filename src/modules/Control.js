@@ -1,5 +1,5 @@
 const {logger} = require("./Logger")
-const {djangoDate, bBox, isExists} = require('./utils')
+const {djangoDate, bBox} = require('./utils')
 
 const Camera = require('./Camera')
 
@@ -37,7 +37,6 @@ class Control {
     processedSide = null
     timeFromLastProcessedCorner = 0
     cornersState = [false, false, false, false]
-    isLocalDebug = process.env.isLocalDebug || false
 
     hkkCounter = 0
     hkkLast = null
@@ -268,11 +267,6 @@ class Control {
         this.updateCornersState()
         this.writeToLogs(EVENTS[1])
         this.addToReport(`${this.cornersProcessed} corner processed`, true)
-        if (this.isLocalDebug) {
-            isExists(`debug/${this.operationId}`)
-            let snapshot = new Snapshot(this.camera.snapshot.buffer)
-            snapshot.saveTo(`debug/${this.operationId}/${this.cornersProcessed}.jpeg`)
-        }
     }
     updateCornersState() {
         let i = null
