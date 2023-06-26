@@ -1,3 +1,10 @@
+logger("container started",`
+Container started at ${djangoDate(new Date())}:
+camera_url: ${camera_url}
+folder: ${folder}
+server_url: ${server_url}
+`)
+
 const {djangoDate, isExists} = require('./modules/utils')
 const {logger} = require("./modules/Logger")
 const Camera = require('./modules/Camera')
@@ -12,13 +19,6 @@ isExists("images")
 isExists(folder)
 isExists("debug/")
 isExists("debug/operation-control")
-
-logger("container started",`
-Container started at ${djangoDate(new Date())}:
-camera_url: ${camera_url}
-folder: ${folder}
-server_url: ${server_url}
-`)
 
 const run = async () => {
     const camera = new Camera(camera_url)
