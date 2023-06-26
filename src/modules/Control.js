@@ -111,7 +111,8 @@ class Control {
         let woRes = []
         let worker = wnRes?.find(d => d.class === 'worker')
         if (worker) {
-            const workerBlob = await cutRegionFromBlob(this.camera.snapshot.buffer, [1080, 1920], worker.bbox)
+            const snapshot = new Snapshot(this.camera.snapshot.buffer)
+            const workerBlob = await snapshot.cutRegionFromBlob(worker.bbox)
             woRes = await workers[1].exec(workerBlob)
             const OFFSET_X = worker.x
             const OFFSET_Y = worker.y
