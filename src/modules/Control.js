@@ -1,7 +1,7 @@
 const fs = require('fs')
 const {logger} = require("./Logger")
-const {cutString, cutRegionFromBlob, djangoDate} = require('../utils/')
-const ModelWorker = require('../workers/ModelWorker')
+const {cutString, cutRegionFromBlob, djangoDate} = require('./utils')
+const ModelWorker = require('./Detector/workers/ModelWorker')
 const Report = require('./Report')
 const setColor = colorCode => `\x1b[${colorCode}m%s\x1b[0m`
 let CONSOLE_COLORS = {

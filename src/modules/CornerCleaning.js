@@ -1,4 +1,4 @@
-const {djangoDate, bBox, isExists} = require('../utils')
+const {djangoDate, bBox, isExists} = require('./utils')
 const {Control} = require('./Control')
 const Snapshot = require('./Snapshot')
 const {logger} = require("./Logger")

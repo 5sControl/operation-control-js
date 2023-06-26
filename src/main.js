@@ -1,8 +1,7 @@
-const {djangoDate, isExists} = require('./utils')
-const {logger} = require("./entities/Logger")
-
-const Camera = require('./entities/Camera')
-const CornerCleaning = require("./entities/CornerCleaning")
+const {djangoDate, isExists} = require('./modules/utils')
+const {logger} = require("./modules/Logger")
+const Camera = require('./modules/Camera')
+const CornerCleaning = require("./modules/CornerCleaning")
 
 const camera_url = process.env.camera_url || "http://192.168.1.110:3456/onvif-http/snapshot?Profile_1"
 const folder = process.env.folder || "images/192.168.1.110"

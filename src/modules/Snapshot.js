@@ -1,5 +1,5 @@
 const fs = require('fs')
-const {djangoDate} = require('../utils')
+const {djangoDate} = require('./utils')
 const {createCanvas, Image} = require('@napi-rs/canvas')
 
 class Snapshot {
