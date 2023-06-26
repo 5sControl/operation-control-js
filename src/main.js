@@ -1,5 +1,5 @@
 const {djangoDate, isExists} = require('./utils')
-const {logger} = require("./Logger")
+const {logger} = require("./entities/Logger")
 
 const Camera = require('./entities/Camera')
 const CornerCleaning = require("./entities/CornerCleaning")

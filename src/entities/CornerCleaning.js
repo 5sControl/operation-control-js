@@ -1,7 +1,7 @@
 const {djangoDate, bBox, isExists} = require('../utils')
 const {Control} = require('./Control')
 const Snapshot = require('./Snapshot')
-const {logger} = require("../Logger")
+const {logger} = require("./Logger")
 
 const EVENTS = [
     "Begin of operation",

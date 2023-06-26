@@ -13,7 +13,7 @@ class Camera {
     client = null
     resolution = [1080, 1920]
 
-    isLocalDebug = false
+    isLocalDebug = true
     lastSnapshotLength = 0
 
     constructor() {
@@ -39,7 +39,7 @@ class Camera {
     async getSnapshot() {
         try {
             if (this.isLocalDebug) {
-                this.snapshot.buffer = fs.readFileSync('snapshot.jpeg')
+                this.snapshot.buffer = fs.readFileSync('src/snapshot.jpeg')
             } else {                
                 const response = await fetch(this.snapshot.uri)
                 console.log(response)

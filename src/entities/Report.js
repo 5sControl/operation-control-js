@@ -1,6 +1,6 @@
 const fs = require('fs')
 const crypto = require('crypto')
-const {logger} = require("../Logger")
+const {logger} = require("./Logger")
 
 class Report {
     constructor(serverUrl, hostname, controlType, potentialReports, controlPayload) {

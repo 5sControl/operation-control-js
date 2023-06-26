@@ -1,5 +1,5 @@
 const fs = require('fs')
-const {logger} = require("../Logger")
+const {logger} = require("./Logger")
 const {cutString, cutRegionFromBlob, djangoDate} = require('../utils/')
 const ModelWorker = require('../workers/ModelWorker')
 const Report = require('./Report')
