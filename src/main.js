@@ -21,11 +21,8 @@ server_url: ${server_url}
 `)
 
 const run = async () => {
-    const camera = new Camera()
-    const reqBody = {algorithm: 'operation_control', camera_url, server_url, extra: []}
-    const cameraInterval = await camera.init(reqBody, folder)
-    const createdAlgorithm = new CornerCleaning(cameraInterval.camera, 'operation_control', [])
-    await createdAlgorithm.start(cameraInterval.camera)
+    const camera = new Camera(camera_url)
+    await new CornerCleaning(camera).start()
     logger("control started")
 }
 run()

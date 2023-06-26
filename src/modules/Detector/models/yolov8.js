@@ -1,9 +1,7 @@
 const path = require('path')
 const tf = require('@tensorflow/tfjs-node')
 
-const COCO_LABELS = require('./coco-labels')
 const MODELS = {
-    './yolov8m/model.json': COCO_LABELS,
     './corner-cleaning/ww/model.json': ["window", "worker"],
     './corner-cleaning/wo/model.json': ["hkk", "various"]
 }
