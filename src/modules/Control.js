@@ -1,11 +1,10 @@
 const {logger} = require("./Logger")
 const {djangoDate} = require('./utils/Date')
-const {bBox} = require('./utils/2D')
 
 const Camera = require('./Camera')
 
-const {cutRegionFromBlob} = require('./utils/Date')
 const ModelWorker = require('./Detector/workers/ModelWorker')
+const {bBox} = require('./utils/2D')
 
 const Snapshot = require('./Snapshot')
 const Report = require('./Report')
