@@ -13,7 +13,7 @@ class Camera {
     client = null
     resolution = [1080, 1920]
 
-    isLocalDebug = true
+    isLocalDebug = process.env.isLocalDebug || false
     lastSnapshotLength = 0
 
     constructor() {
