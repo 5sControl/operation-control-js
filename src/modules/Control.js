@@ -4,7 +4,7 @@ const {djangoDate} = require('./utils/Date')
 const Camera = require('./Camera')
 const Detector = require('./Detector')
 
-const {bBox} = require('./utils/2D')
+const {bBox, isOperationOnWindow, withinWorkspace, whatSide} = require('./utils/2D')
 
 const Snapshot = require('./Snapshot')
 const Report = require('./Report')
@@ -92,7 +92,7 @@ class Control {
         let empty_w = !detectClasses.has("window") && !detectClasses.has("worker")
 
         if (full_w && !this.startTracking) {
-            if (!this.withinWorkspace(this.window.bbox)) return
+            if (!withinWorkspace(this.window.bbox, this.WORKSPACE_BOUNDARIES)) return
             this.isBeginTimer++
             this.writeToLogs(`Worker with window appeared: ${this.isBeginTimer}s`)
             if (this.isBeginTimer > 5) this.begin()
@@ -145,7 +145,7 @@ class Control {
             // also 2D (is hkk-rect in wspace-rect)
             const [x, y] = bBox.getOrigin(this.detector.predictions.o[0].bbox)
             if (x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1]) {
-                if (this.isOperationOnWindow(this.detector.predictions.o[0].bbox, this.window.bbox)) {
+                if (isOperationOnWindow(this.detector.predictions.o[0].bbox, this.window.bbox)) {
                     this.hkkCounter++
                     this.hkkLast = this.detector.predictions.o[0]
                 } else {
@@ -155,7 +155,7 @@ class Control {
         } else {
             if (this.hkkCounter >= 1) {
                 this.writeToLogs("Action performed", false) // Найдена операция
-                const currentSide = this.whatSide()
+                const currentSide = whatSide(this.hkkLast.bbox, this.window.edgeCorners)
                 if (this.processedSide === null) {
                     this.writeToLogs("No side has been counted yet", false) // Никакой стороны ещё не было засчитано
                     await this.addCleanedCorner(currentSide)
@@ -211,46 +211,6 @@ class Control {
     }
     cleanLogs() {
         this.logs = []
-    }
-
-
-    withinWorkspace(bbox) { // refactor[2D]: rect in another rect
-        const [x, y, width, height] = bbox
-        return x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1] ? true : false
-    }
-    // 2D
-    /**
-     * @returns {"left" | "right"}
-     */
-    whatSide() {
-        if (this.hkkLast.bbox !== null) {
-            const operationOrigin = bBox.getOrigin(this.hkkLast.bbox)
-            if (operationOrigin) {
-                const diffX = operationOrigin[0] - this.window.edgeCorners[0][0]
-                const halfWindowWidth = (this.window.edgeCorners[1][0] - this.window.edgeCorners[0][0])/2
-                const side = diffX < halfWindowWidth ? "left" : "right"
-                return side
-            }
-        } else {
-            return "right"
-        }
-    }
-    isOperationOnWindow(operationBbox, windowBbox) {
-        const operationRect = this.convertBboxToRect(operationBbox)
-        const windowRect = this.convertBboxToRect(windowBbox)
-        return this.rectanglesIntersect(operationRect, windowRect)
-    }
-    convertBboxToRect(bbox) {
-        const [x, y, width, height] = bbox
-        return [x, y, x + width, y + height]
-    }
-    /**
-     * @returns {boolean}
-     */
-    rectanglesIntersect(rectA, rectB) {
-        const [minAx, minAy, maxAx, maxAy] = rectA
-        const [minBx,  minBy,  maxBx,  maxBy] = rectB
-        return maxAx >= minBx && minAx <= maxBx && minAy <= maxBy && maxAy >= minBy
     }
 
 }

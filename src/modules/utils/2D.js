@@ -21,4 +21,44 @@ function pointsDistanceModule(point_1, point_2) {
     return [xModule, yModule]
 }
 
-module.exports = { bBox }
+function isOperationOnWindow(operationBbox, windowBbox) {
+    const operationRect = convertBboxToRect(operationBbox)
+    const windowRect = convertBboxToRect(windowBbox)
+    return rectanglesIntersect(operationRect, windowRect)
+}
+function convertBboxToRect(bbox) {
+    const [x, y, width, height] = bbox
+    return [x, y, x + width, y + height]
+}
+/**
+ * @returns {boolean}
+ */
+function rectanglesIntersect(rectA, rectB) {
+    const [minAx, minAy, maxAx, maxAy] = rectA
+    const [minBx,  minBy,  maxBx,  maxBy] = rectB
+    return maxAx >= minBx && minAx <= maxBx && minAy <= maxBy && maxAy >= minBy
+}
+
+function withinWorkspace(bbox, rect) { // rect in another rect
+    const [x, y, width, height] = bbox
+    return x < rect[0] && y < rect[1] ? true : false
+}
+
+/**
+ * @returns {"left" | "right"}
+ */
+function whatSide(rect, corners) {
+    if (rect !== null) {
+        const operationOrigin = bBox.getOrigin(rect)
+        if (operationOrigin) {
+            const diffX = operationOrigin[0] - corners[0][0]
+            const halfWindowWidth = (corners[1][0] - corners[0][0])/2
+            const side = diffX < halfWindowWidth ? "left" : "right"
+            return side
+        }
+    } else {
+        return "right"
+    }
+}
+
+module.exports = { bBox, isOperationOnWindow, withinWorkspace, whatSide }
