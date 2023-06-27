@@ -44,8 +44,6 @@ class Control {
     hkkCounter = 0
     hkkLast = null
 
-    logs = []
-
     photosForReport = []
 
     constructor() {}
@@ -71,7 +69,6 @@ class Control {
 
         await this.detector.getPredictions(this.camera.snapshot.buffer)
 
-        this.cleanLogs()
         this.status()
         if (this.startTracking) this.isCornerProcessed()
     }
@@ -94,12 +91,12 @@ class Control {
         if (full_w && !this.startTracking) {
             if (!withinWorkspace(this.window.bbox, this.WORKSPACE_BOUNDARIES)) return
             this.isBeginTimer++
-            this.writeToLogs(`Worker with window appeared: ${this.isBeginTimer}s`)
+            logger(`Worker with window appeared: ${this.isBeginTimer}s`)
             if (this.isBeginTimer > 5) this.begin()
         }
         if (empty_w && this.startTracking && !this.stopTracking) {
             this.isEndTimer++
-            this.writeToLogs(`Worker with window disappeared: ${this.isEndTimer}s`)
+            logger(`Worker with window disappeared: ${this.isEndTimer}s`)
             if (this.isEndTimer > 5) this.end()
         }
     }
@@ -108,7 +105,7 @@ class Control {
         this.startTracking = djangoDate(new Date())
         this.isBeginTimer = 0
         this.window.currentSide = "first"
-        this.writeToLogs(EVENTS[0])
+        logger(EVENTS[0])
         this.addToReport(EVENTS[0])
     }
     async end() {
@@ -120,7 +117,7 @@ class Control {
         this.timeFromLastProcessedCorner = 0
         this.hkkLast = null
 
-        this.writeToLogs(EVENTS[EVENTS.length - 1])
+        logger(EVENTS[EVENTS.length - 1])
         await this.addToReport(EVENTS[EVENTS.length - 1])
 
         const report = new Report(this.photosForReport, { 
@@ -149,27 +146,27 @@ class Control {
                     this.hkkCounter++
                     this.hkkLast = this.detector.predictions.o[0]
                 } else {
-                    this.writeToLogs('hkk not on window!')
+                    logger('hkk not on window!')
                 }
             }
         } else {
             if (this.hkkCounter >= 1) {
-                this.writeToLogs("Action performed", false) // Найдена операция
+                logger("Action performed")
                 const currentSide = whatSide(this.hkkLast.bbox, this.window.edgeCorners)
                 if (this.processedSide === null) {
-                    this.writeToLogs("No side has been counted yet", false) // Никакой стороны ещё не было засчитано
+                    logger("No side has been counted yet")
                     await this.addCleanedCorner(currentSide)
                 } else {
-                    this.writeToLogs("Some angle was counted", false) // Какой-то угол был засчитан
+                    logger("Some angle was counted")
                     if (currentSide === this.processedSide) {
-                        this.writeToLogs(`It was the same corner (${this.processedSide})`, false) // Это был тот же угол
+                        logger(`It was the same corner (${this.processedSide})`)
                         if (this.timeFromLastProcessedCorner > 30) {
                             await this.addCleanedCorner(currentSide)
-                            this.writeToLogs(`Same angle but more than 30 seconds`, false) // Тот же угол, но больше 30 секунд
+                            logger(`Same angle but more than 30 seconds`)
                         }
                     } else {
                         await this.addCleanedCorner(currentSide)
-                        this.writeToLogs(`It was a different angle (${this.processedSide})`, false) // Это был другой угол
+                        logger(`It was a different angle (${this.processedSide})`)
                     }
                 }
             }
@@ -182,7 +179,7 @@ class Control {
         this.timeFromLastProcessedCorner = 0
         if (this.cornersProcessed === 3) this.window.currentSide = "second"
         this.updateCornersState()
-        this.writeToLogs(EVENTS[1])
+        logger(EVENTS[1])
         this.addToReport(`${this.cornersProcessed} corner processed`, true)
     }
     updateCornersState() {
@@ -203,14 +200,6 @@ class Control {
         if (isDrawCornersState) promises.push(snapshot.drawCornersState(this.window.bbox, this.cornersState, this.window.currentSide))
         await Promise.all(promises)
         this.photosForReport = [...this.photosForReport, snapshot]
-    }
-
-    writeToLogs(event) {
-        this.logs.push(event)
-        logger(event)
-    }
-    cleanLogs() {
-        this.logs = []
     }
 
 }
