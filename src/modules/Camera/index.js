@@ -1,24 +1,19 @@
-const fs = require('fs')
-
 class Camera {
 
     snapshot = {
-        uri: "",
         buffer: null
     }
 
     isLocalDebug = process.env.isLocalDebug || false
     lastSnapshotLength = 0
 
-    constructor(camera_url) {
-        this.snapshot.uri = camera_url
-    }
     async getSnapshot() {
         try {
             if (this.isLocalDebug) {
+                const fs = require('fs')
                 this.snapshot.buffer = fs.readFileSync('src/modules/Camera/snapshot.jpeg')
             } else {
-                const response = await fetch(this.snapshot.uri)
+                const response = await fetch(process.env.camera_url)
                 console.log(response)
                 this.snapshot.buffer = response
             }

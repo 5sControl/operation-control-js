@@ -28,7 +28,7 @@ class Operation {
 
     report = new Report()
 
-    check(window, full_w, empty_w, buffer, isHKKdetected, action) {
+    check(buffer, window, full_w, empty_w, isHKKdetected, action) {
         this.buffer = buffer
         if (window) {
             this.window.bbox = window.bbox

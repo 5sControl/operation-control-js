@@ -4,7 +4,7 @@ const Operation = require('./Operation')
 
 class Control {
 
-    camera = new Camera(process.env.camera_url)
+    camera = new Camera()
     detector = new Detector()
     operation = new Operation()
 
@@ -17,7 +17,7 @@ class Control {
         let checkBuffer = bufferFromGer ? bufferFromGer : await this.camera.getSnapshot()
         if (checkBuffer) {
             await this.detector.getPredictions(checkBuffer)
-            
+
             // this.detector.isWDetected()
             let detectClasses = new Set()
             for (const detection of this.detector.isAnyDetections()) detectClasses.add(detection.class)
@@ -28,7 +28,7 @@ class Control {
             // this.detector.isHKKDetected()
             let isHKKdetected = this.detector.isAnyDetections(["hkk"], "boolean", 0.9)
     
-            this.operation.check(window, full_w, empty_w, checkBuffer, isHKKdetected, this.detector.predictions.o[0])
+            this.operation.check(checkBuffer, window, full_w, empty_w, isHKKdetected, this.detector.predictions.o[0])
         }
     }
 
