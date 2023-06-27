@@ -1,4 +1,4 @@
-const dispatcher = require('../Dispatcher')
+const dispatcher = require('./Dispatcher')
 
 class Camera {
 
@@ -27,7 +27,7 @@ class Camera {
         try {
             if (process.env.isLocalDebug) {
                 const fs = require('fs')
-                this.snapshot.buffer.current = fs.readFileSync('src/modules/Camera/snapshot.jpeg')
+                this.snapshot.buffer.current = fs.readFileSync('debug/snapshot.jpeg')
             } else {
                 const response = await fetch(process.env.camera_url)
                 console.log(response)
