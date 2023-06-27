@@ -35,7 +35,7 @@ class Camera {
             }
             if (!this.snapshot.isExist()) {dispatcher.emit("snapshot null"); return}
             if (!this.snapshot.isAnother()) {dispatcher.emit("snapshot same"); return}
-            if (!this.snapshot.isCorrect()) {dispatcher.emit("snapshot broken"); return}
+            if (!this.snapshot.isCorrect()) {dispatcher.emit("snapshot broken", `buffer length is ${this.snapshot.buffer.current.length} \n`); return}
             this.snapshot.saveLastLength()
             dispatcher.emit("snapshot updated", false)
             return this.snapshot.buffer
