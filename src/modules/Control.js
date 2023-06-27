@@ -1,9 +1,6 @@
-const {djangoDate} = require('./utils/Date')
-const {bBox, isOperationOnWindow, withinWorkspace, whatSide} = require('./utils/2D')
 const Camera = require('./Camera')
 const Detector = require('./Detector')
-const Report = require('./Report')
-const {logger} = require("./Logger")
+const Operation = require('./Operation')
 
 class Control {
 
@@ -12,28 +9,7 @@ class Control {
     detector = new Detector()
     WORKSPACE_BOUNDARIES = [1600, 900]
 
-    report = new Report()
-
-    // operation
-    operationId = null
-    startTracking = null
-    stopTracking = null
-    cornersProcessed = 0
-    // counters
-    isBeginTimer = 0
-    isEndTimer = 0
-
-    window = {
-        bbox: [], // Rect
-        edgeCorners: [null, null], // [Point, Point], left and right of current side
-        currentSide: "first" // "first", "second"
-    }
-    processedSide = null
-    timeFromLastProcessedCorner = 0
-    cornersState = [false, false, false, false]
-
-    hkkCounter = 0
-    hkkLast = null
+    operation = new Operation()
 
     async start(isWithTimer = true) {
         await this.detector.loadModels()
@@ -48,6 +24,7 @@ class Control {
             await this.camera.getSnapshot()
             if (!this.camera.snapshot.buffer) return
             if (this.camera.snapshot.buffer.length < 1000) {
+                const {logger} = require("./Logger")
                 logger("translation broken", `buffer length is ${buffer.length} \n`)
                 return
             }
@@ -56,130 +33,17 @@ class Control {
 
         await this.detector.getPredictions(this.camera.snapshot.buffer)
 
-        this.status()
-        if (this.startTracking) this.isCornerProcessed()
-    }
-
-    status() {
-        // Control.isAnyDetections([], "set")
+        // this.detector.isWDetected()
         let detectClasses = new Set()
         for (const detection of this.detector.isAnyDetections()) detectClasses.add(detection.class)
-
         // update this.window and this.worker
         const window = this.detector.predictions.w?.find(detection => detection.class === "window" && detection.score > 0.5)
-        if (window) {
-            this.window.bbox = window.bbox
-            const [x, y, width, height] = this.window.bbox
-            this.window.edgeCorners = [[x, y+height], [x+width, y+height]]
-        }
         let full_w = detectClasses.has("window") && detectClasses.has("worker")
         let empty_w = !detectClasses.has("window") && !detectClasses.has("worker")
-
-        if (full_w && !this.startTracking) {
-            if (!withinWorkspace(this.window.bbox, this.WORKSPACE_BOUNDARIES)) return
-            this.isBeginTimer++
-            logger(`Worker with window appeared: ${this.isBeginTimer}s`)
-            if (this.isBeginTimer > 5) this.begin()
-        }
-        if (empty_w && this.startTracking && !this.stopTracking) {
-            this.isEndTimer++
-            logger(`Worker with window disappeared: ${this.isEndTimer}s`)
-            if (this.isEndTimer > 5) this.end()
-        }
-    }
-    async begin() {
-        this.operationId = +new Date()
-        this.startTracking = djangoDate(new Date())
-        this.isBeginTimer = 0
-        this.window.currentSide = "first"
-        logger("Begin of operation")
-        this.report.add(this.camera.snapshot.buffer, "Begin of operation")
-    }
-    async end() {
-        this.operationId = null
-        this.stopTracking = djangoDate(new Date())
-        this.isEndTimer = 0
-
-        this.processedSide = null
-        this.timeFromLastProcessedCorner = 0
-        this.hkkLast = null
-
-        logger("End of operation")
-        await this.report.add(this.camera.snapshot.buffer, "End of operation")
-
-        this.report.send({
-            cornersProcessed: this.cornersProcessed,
-            startTracking: this.startTracking,
-            stopTracking: this.stopTracking,
-            operationType: this.cornersProcessed === 0 ? "unknown" : "cleaning corners"
-        })
-
-        this.cornersProcessed = 0
-        this.cornersState = [false, false, false, false]
-        this.startTracking = null
-        this.stopTracking = null
-
-    }
-    async isCornerProcessed() {
-        this.timeFromLastProcessedCorner++
+        // this.detector.isHKKDetected()
         let isHKKdetected = this.detector.isAnyDetections(["hkk"], "boolean", 0.9)
-        if (isHKKdetected) {
-            // also 2D (is hkk-rect in wspace-rect)
-            const [x, y] = bBox.getOrigin(this.detector.predictions.o[0].bbox)
-            if (x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1]) {
-                if (isOperationOnWindow(this.detector.predictions.o[0].bbox, this.window.bbox)) {
-                    this.hkkCounter++
-                    this.hkkLast = this.detector.predictions.o[0]
-                } else {
-                    logger('hkk not on window!')
-                }
-            }
-        } else {
-            if (this.hkkCounter >= 1) {
-                logger("Action performed")
-                const currentSide = whatSide(this.hkkLast.bbox, this.window.edgeCorners)
-                if (this.processedSide === null) {
-                    logger("No side has been counted yet")
-                    await this.addCleanedCorner(currentSide)
-                } else {
-                    logger("Some angle was counted")
-                    if (currentSide === this.processedSide) {
-                        logger(`It was the same corner (${this.processedSide})`)
-                        if (this.timeFromLastProcessedCorner > 30) {
-                            await this.addCleanedCorner(currentSide)
-                            logger(`Same angle but more than 30 seconds`)
-                        }
-                    } else {
-                        await this.addCleanedCorner(currentSide)
-                        logger(`It was a different angle (${this.processedSide})`)
-                    }
-                }
-            }
-            this.hkkCounter = 0
-        }
-    }
-    async addCleanedCorner(processedSide) {
-        this.cornersProcessed++
-        this.processedSide = processedSide
-        this.timeFromLastProcessedCorner = 0
-        if (this.cornersProcessed === 3) this.window.currentSide = "second"
-        this.updateCornersState()
 
-        logger("Corner processed")
-        this.report.add(this.camera.snapshot.buffer, `${this.cornersProcessed} corner processed`, true, this.window.bbox, this.cornersState, this.window.currentSide)
-
-    }
-    updateCornersState() {
-        let i = null
-        switch (this.window.currentSide) {
-            case "first":
-                i = this.processedSide === "left" ? 0 : 1
-                break
-            case "second":
-                i = this.processedSide === "left" ? 2 : 3
-                break
-        }
-        this.cornersState[i] = true
+        this.operation.check(window, full_w, empty_w, this.camera.snapshot.buffer, isHKKdetected, this.detector.predictions.o[0])
     }
 
 }
