@@ -22,6 +22,14 @@ class Camera {
                 console.log(response)
                 this.snapshot.buffer = response
             }
+            if (!this.camera.snapshot.buffer) return
+            if (this.camera.snapshot.buffer.length < 1000) {
+                const {logger} = require("../Logger")
+                logger("translation broken", `buffer length is ${buffer.length} \n`)
+                return
+            }
+            if (this.camera.isVideoStreamOnPause()) return
+            return this.snapshot.buffer
         } catch (error) {
             console.log('code: ', error.code)
             console.log('socket: ', error.socket?.remoteAddress)
