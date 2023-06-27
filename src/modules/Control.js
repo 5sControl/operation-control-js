@@ -5,10 +5,7 @@ const Operation = require('./Operation')
 class Control {
 
     camera = new Camera(process.env.camera_url)
-
     detector = new Detector()
-    WORKSPACE_BOUNDARIES = [1600, 900]
-
     operation = new Operation()
 
     async start(isWithTimer = true) {
@@ -20,6 +17,7 @@ class Control {
         let checkBuffer = bufferFromGer ? bufferFromGer : await this.camera.getSnapshot()
         if (checkBuffer) {
             await this.detector.getPredictions(checkBuffer)
+            
             // this.detector.isWDetected()
             let detectClasses = new Set()
             for (const detection of this.detector.isAnyDetections()) detectClasses.add(detection.class)
