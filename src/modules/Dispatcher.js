@@ -2,9 +2,9 @@ const {EventEmitter} = require('events')
 const {logger} = require('./Logger')
 
 class Dispatcher extends EventEmitter {
-    emit(event) {
+    emit(event, payload) {
         super.emit(event)
-        logger(event)
+        if (payload !== false) logger(event, payload)
     }
 }
 

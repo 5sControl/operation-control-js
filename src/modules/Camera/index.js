@@ -1,3 +1,5 @@
+const dispatcher = require('../Dispatcher')
+
 class Camera {
 
     snapshot = {
@@ -31,14 +33,14 @@ class Camera {
                 console.log(response)
                 this.snapshot.buffer.current = response
             }
-            if (!this.snapshot.isExist()) {console.log("snapshot null"); return}
-            if (!this.snapshot.isAnother()) {console.log("snapshot same"); return}
-            if (!this.snapshot.isCorrect()) {console.log("snapshot broken"); return}
+            if (!this.snapshot.isExist()) {dispatcher.emit("snapshot null"); return}
+            if (!this.snapshot.isAnother()) {dispatcher.emit("snapshot same"); return}
+            if (!this.snapshot.isCorrect()) {dispatcher.emit("snapshot broken"); return}
             this.snapshot.saveLastLength()
-            console.log("snapshot updated")
+            dispatcher.emit("snapshot updated", false)
             return this.snapshot.buffer
         } catch (error) {
-            console.log("snapshot update error", error)
+            dispatcher.emit("snapshot update error", error)
         }
     }
 
