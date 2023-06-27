@@ -1,3 +1,4 @@
+const dispatcher = require('./Dispatcher')
 const Camera = require('./Camera')
 const Detector = require('./Detector')
 const Operation = require('./Operation')
@@ -11,6 +12,7 @@ class Control {
     async start(isWithTimer = true) {
         await this.detector.loadModels()
         if (isWithTimer) setInterval(() => this.check(), 1000)
+        dispatcher.emit("control started")
     }
 
     async check(bufferFromGer) {

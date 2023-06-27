@@ -8,4 +8,4 @@ const {checkDirs} = require('./modules/utils/Path')
 checkDirs(["images", process.env.folder, "debug/", "debug/operation-control"])
 
 const Control = require("./modules/Control")
-new Control().start().then(() => logger("control started"))
+new Control().start()
