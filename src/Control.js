@@ -18,7 +18,7 @@ class Control {
     async check(bufferFromGer) {
         let checkBuffer = bufferFromGer ? bufferFromGer : await this.camera.getSnapshot()
         if (checkBuffer) {
-            await this.detector.getPredictions(checkBuffer)
+            await this.detector.getPredictions(checkBuffer) // detector.detect
     
             // this.detector.isWDetected()
             let detectClasses = new Set()
