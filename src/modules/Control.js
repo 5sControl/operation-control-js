@@ -1,19 +1,9 @@
-const {logger} = require("./Logger")
 const {djangoDate} = require('./utils/Date')
-
+const {bBox, isOperationOnWindow, withinWorkspace, whatSide} = require('./utils/2D')
 const Camera = require('./Camera')
 const Detector = require('./Detector')
-
-const {bBox, isOperationOnWindow, withinWorkspace, whatSide} = require('./utils/2D')
-
-const Snapshot = require('./Snapshot')
 const Report = require('./Report')
-
-const EVENTS = [
-    "Begin of operation",
-    "Corner processed",
-    "End of operation"
-]
+const {logger} = require("./Logger")
 
 class Control {
 
@@ -22,12 +12,13 @@ class Control {
     detector = new Detector()
     WORKSPACE_BOUNDARIES = [1600, 900]
 
+    report = new Report()
+
     // operation
     operationId = null
     startTracking = null
     stopTracking = null
     cornersProcessed = 0
-
     // counters
     isBeginTimer = 0
     isEndTimer = 0
@@ -43,10 +34,6 @@ class Control {
 
     hkkCounter = 0
     hkkLast = null
-
-    photosForReport = []
-
-    constructor() {}
 
     async start(isWithTimer = true) {
         await this.detector.loadModels()
@@ -105,8 +92,8 @@ class Control {
         this.startTracking = djangoDate(new Date())
         this.isBeginTimer = 0
         this.window.currentSide = "first"
-        logger(EVENTS[0])
-        this.addToReport(EVENTS[0])
+        logger("Begin of operation")
+        this.report.add(this.camera.snapshot.buffer, "Begin of operation")
     }
     async end() {
         this.operationId = null
@@ -117,17 +104,15 @@ class Control {
         this.timeFromLastProcessedCorner = 0
         this.hkkLast = null
 
-        logger(EVENTS[EVENTS.length - 1])
-        await this.addToReport(EVENTS[EVENTS.length - 1])
+        logger("End of operation")
+        await this.report.add(this.camera.snapshot.buffer, "End of operation")
 
-        const report = new Report(this.photosForReport, { 
+        this.report.send({
             cornersProcessed: this.cornersProcessed,
             startTracking: this.startTracking,
             stopTracking: this.stopTracking,
             operationType: this.cornersProcessed === 0 ? "unknown" : "cleaning corners"
         })
-        report.send()
-        this.photosForReport = []
 
         this.cornersProcessed = 0
         this.cornersState = [false, false, false, false]
@@ -179,8 +164,10 @@ class Control {
         this.timeFromLastProcessedCorner = 0
         if (this.cornersProcessed === 3) this.window.currentSide = "second"
         this.updateCornersState()
-        logger(EVENTS[1])
-        this.addToReport(`${this.cornersProcessed} corner processed`, true)
+
+        logger("Corner processed")
+        this.report.add(this.camera.snapshot.buffer, `${this.cornersProcessed} corner processed`, true, this.window.bbox, this.cornersState, this.window.currentSide)
+
     }
     updateCornersState() {
         let i = null
@@ -193,13 +180,6 @@ class Control {
                 break
         }
         this.cornersState[i] = true
-    }
-    async addToReport(event, isDrawCornersState = false) {
-        let snapshot = new Snapshot(this.camera.snapshot.buffer)
-        let promises = [snapshot.drawEvent(event)]
-        if (isDrawCornersState) promises.push(snapshot.drawCornersState(this.window.bbox, this.cornersState, this.window.currentSide))
-        await Promise.all(promises)
-        this.photosForReport = [...this.photosForReport, snapshot]
     }
 
 }
