@@ -1,5 +1,5 @@
-const {logger} = require("./modules/Logger")
-logger("container started",`camera_url: ${process.env.camera_url}
+const dispatcher = require('./modules/Dispatcher')
+dispatcher.emit("container started", `camera_url: ${process.env.camera_url}
 folder: ${process.env.folder}
 server_url: ${process.env.server_url}
 `)
