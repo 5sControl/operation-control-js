@@ -17,7 +17,7 @@ class Camera {
         try {
             if (this.isLocalDebug) {
                 this.snapshot.buffer = fs.readFileSync('src/modules/Camera/snapshot.jpeg')
-            } else {                
+            } else {
                 const response = await fetch(this.snapshot.uri)
                 console.log(response)
                 this.snapshot.buffer = response

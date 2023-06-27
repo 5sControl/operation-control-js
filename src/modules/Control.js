@@ -2,8 +2,8 @@ const {logger} = require("./Logger")
 const {djangoDate} = require('./utils/Date')
 
 const Camera = require('./Camera')
+const Detector = require('./Detector')
 
-const ModelWorker = require('./Detector/workers/ModelWorker')
 const {bBox} = require('./utils/2D')
 
 const Snapshot = require('./Snapshot')
@@ -17,7 +17,10 @@ const EVENTS = [
 
 class Control {
 
-    camera
+    camera = new Camera(process.env.camera_url)
+
+    detector = new Detector()
+    WORKSPACE_BOUNDARIES = [1600, 900]
 
     // operation
     operationId = null
@@ -46,149 +49,28 @@ class Control {
     photosForReport = []
 
     constructor() {}
+
     async start(isWithTimer = true) {
+        await this.detector.loadModels()
+        if (isWithTimer) setInterval(() => this.check(), 1000)
+    }
 
-        this.camera = new Camera(process.env.camera_url)
-        await this.loadModels()
+    async check(bufferFromGer) {
 
-        if (isWithTimer) setInterval(async () => {
+        if (bufferFromGer) {
+            this.camera.snapshot.buffer = bufferFromGer
+        } else {
             await this.camera.getSnapshot()
-            await this.getPredictions()
-        }, 1000)
-    }
-
-    //Detector
-    WORKSPACE_BOUNDARIES = [1600, 900]
-    HKK_MIN_SCORE = 0.9
-    model
-    predictions
-    async loadModels() {
-        if (!this.model) {
-            console.time(`models load`)
-            this.model = {
-                w: new ModelWorker("ww"),
-                o: new ModelWorker("wo")
-            }
-            await this.getWorkersPredictions([this.model.w, this.model.o])
-            console.timeEnd(`models load`)
-        }
-    }
-    async getPredictions() {
-        try {
-
-            /// to Camera
             if (!this.camera.snapshot.buffer) return
             if (this.camera.snapshot.buffer.length < 1000) {
-                logger("translation broken", `buffer length is ${this.camera.snapshot.buffer.length} \n`)
+                logger("translation broken", `buffer length is ${buffer.length} \n`)
                 return
             }
-            //// 
-
-            this.predictions = null
-            try {
-                const prev = Date.now()
-                const [result_w, result_o] = await this.getWorkersPredictions([this.model.w, this.model.o])
-                this.predictions = {
-                    w: result_w,
-                    o: result_o
-                }
-                const now = Date.now()
-                console.log(`detection: ${now - prev}ms`)
-            } catch (error) {
-                console.log(error, 'setInterval error')
-            }
-            if (!this.predictions.w || !this.predictions.o) return
-
-            this.check()
-
-        } catch (e) {
-            console.log(e, 'e')
+            if (this.camera.isVideoStreamOnPause()) return
         }
-    }
-    async getWorkersPredictions(workers) {
-        if (!this.camera.snapshot.buffer) return
-        const wnRes = await workers[0].exec(this.camera.snapshot.buffer)
-        let woRes = []
-        let worker = wnRes?.find(d => d.class === 'worker')
-        if (worker) {
-            const snapshot = new Snapshot(this.camera.snapshot.buffer)
-            const workerBlob = await snapshot.cutRegionFromBlob(worker.bbox)
-            woRes = await workers[1].exec(workerBlob)
-            const OFFSET_X = worker.x
-            const OFFSET_Y = worker.y
-            woRes = woRes.map(d => {
-                d.x = d.x + OFFSET_X
-                d.y = d.y + OFFSET_Y
-                d.bbox[0] = d.x
-                d.bbox[1] = d.y
-                return d
-            })
-        }
-        return [wnRes, woRes]
-    }
-    /**
-     * @param {string[]} classes Classes to detect
-     * @param {number} minScore Minimum detection score
-     * @param {("array" | "boolean")} returnType What type to return
-     */
-    isAnyDetections(classes, returnType = "array", minScore = 0.5) {
-        const checkClass = prediction => classes === undefined ? true : classes.includes(prediction.class)
-        const isReturnArray = returnType === "array" ? true : false
-        let detection = isReturnArray ? [] : false
-        const predictions = isReturnArray ? this.predictions.w : this.predictions.o
-        try {
-            for (const prediction of predictions) {
-                if (checkClass(prediction) && prediction.score > minScore) {
-                    isReturnArray ? detection.push(prediction) : detection = true
-                }
-            }
-        } catch (error) {
-            console.log("isAnyDetections", error)
-        }
-        return detection
-    }
-    withinWorkspace(bbox) { // refactor[2D]: rect in another rect
-        const [x, y, width, height] = bbox
-        return x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1] ? true : false
-    }
-    // 2D
-    /**
-     * @returns {"left" | "right"}
-     */
-    whatSide() {
-        if (this.hkkLast.bbox !== null) {
-            const operationOrigin = bBox.getOrigin(this.hkkLast.bbox)
-            if (operationOrigin) {
-                const diffX = operationOrigin[0] - this.window.edgeCorners[0][0]
-                const halfWindowWidth = (this.window.edgeCorners[1][0] - this.window.edgeCorners[0][0])/2
-                const side = diffX < halfWindowWidth ? "left" : "right"
-                return side
-            }
-        } else {
-            return "right"
-        }
-    }
-    isOperationOnWindow(operationBbox, windowBbox) {
-        const operationRect = this.convertBboxToRect(operationBbox)
-        const windowRect = this.convertBboxToRect(windowBbox)
-        return this.rectanglesIntersect(operationRect, windowRect)
-    }
-    convertBboxToRect(bbox) {
-        const [x, y, width, height] = bbox
-        return [x, y, x + width, y + height]
-    }
-    /**
-     * @returns {boolean}
-     */
-    rectanglesIntersect(rectA, rectB) {
-        const [minAx, minAy, maxAx, maxAy] = rectA
-        const [minBx,  minBy,  maxBx,  maxBy] = rectB
-        return maxAx >= minBx && minAx <= maxBx && minAy <= maxBy && maxAy >= minBy
-    }
 
+        await this.detector.getPredictions(this.camera.snapshot.buffer)
 
-    async check() {
-        if (this.camera.isVideoStreamOnPause()) return
         this.cleanLogs()
         this.status()
         if (this.startTracking) this.isCornerProcessed()
@@ -197,10 +79,10 @@ class Control {
     status() {
         // Control.isAnyDetections([], "set")
         let detectClasses = new Set()
-        for (const detection of this.isAnyDetections()) detectClasses.add(detection.class)
+        for (const detection of this.detector.isAnyDetections()) detectClasses.add(detection.class)
 
         // update this.window and this.worker
-        const window = this.predictions.w?.find(detection => detection.class === "window" && detection.score > 0.5)
+        const window = this.detector.predictions.w?.find(detection => detection.class === "window" && detection.score > 0.5)
         if (window) {
             this.window.bbox = window.bbox
             const [x, y, width, height] = this.window.bbox
@@ -258,14 +140,14 @@ class Control {
     }
     async isCornerProcessed() {
         this.timeFromLastProcessedCorner++
-        let isHKKdetected = this.isAnyDetections(["hkk"], "boolean", this.HKK_MIN_SCORE)
+        let isHKKdetected = this.detector.isAnyDetections(["hkk"], "boolean", 0.9)
         if (isHKKdetected) {
             // also 2D (is hkk-rect in wspace-rect)
-            const [x, y] = bBox.getOrigin(this.predictions.o[0].bbox)
+            const [x, y] = bBox.getOrigin(this.detector.predictions.o[0].bbox)
             if (x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1]) {
-                if (this.isOperationOnWindow(this.predictions.o[0].bbox, this.window.bbox)) {
+                if (this.isOperationOnWindow(this.detector.predictions.o[0].bbox, this.window.bbox)) {
                     this.hkkCounter++
-                    this.hkkLast = this.predictions.o[0]
+                    this.hkkLast = this.detector.predictions.o[0]
                 } else {
                     this.writeToLogs('hkk not on window!')
                 }
@@ -329,6 +211,46 @@ class Control {
     }
     cleanLogs() {
         this.logs = []
+    }
+
+
+    withinWorkspace(bbox) { // refactor[2D]: rect in another rect
+        const [x, y, width, height] = bbox
+        return x < this.WORKSPACE_BOUNDARIES[0] && y < this.WORKSPACE_BOUNDARIES[1] ? true : false
+    }
+    // 2D
+    /**
+     * @returns {"left" | "right"}
+     */
+    whatSide() {
+        if (this.hkkLast.bbox !== null) {
+            const operationOrigin = bBox.getOrigin(this.hkkLast.bbox)
+            if (operationOrigin) {
+                const diffX = operationOrigin[0] - this.window.edgeCorners[0][0]
+                const halfWindowWidth = (this.window.edgeCorners[1][0] - this.window.edgeCorners[0][0])/2
+                const side = diffX < halfWindowWidth ? "left" : "right"
+                return side
+            }
+        } else {
+            return "right"
+        }
+    }
+    isOperationOnWindow(operationBbox, windowBbox) {
+        const operationRect = this.convertBboxToRect(operationBbox)
+        const windowRect = this.convertBboxToRect(windowBbox)
+        return this.rectanglesIntersect(operationRect, windowRect)
+    }
+    convertBboxToRect(bbox) {
+        const [x, y, width, height] = bbox
+        return [x, y, x + width, y + height]
+    }
+    /**
+     * @returns {boolean}
+     */
+    rectanglesIntersect(rectA, rectB) {
+        const [minAx, minAy, maxAx, maxAy] = rectA
+        const [minBx,  minBy,  maxBx,  maxBy] = rectB
+        return maxAx >= minBx && minAx <= maxBx && minAy <= maxBy && maxAy >= minBy
     }
 
 }
