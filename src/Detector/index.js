@@ -44,6 +44,7 @@ class Detector {
         console.timeEnd("detection")
         this.detections = {
             window_detection,
+            worker_detection,
             detect_window_and_worker,
             detect_nothing,
             action_detection // undefinde || YoloDetection
