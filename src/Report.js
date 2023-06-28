@@ -1,6 +1,6 @@
 const fs = require('fs')
 const crypto = require('crypto')
-const {logger} = require("./Logger")
+const dispatcher = require('./Dispatcher')
 const Snapshot = require('./Snapshot')
 const {djangoDate} = require('./utils/Date')
 
@@ -52,9 +52,9 @@ class Report {
             body
         })
         .then(r => r.text())
-        .then(response => { logger("server response", response) })
-        .catch(err => { logger("error report send", err.code) })
-        logger("report sended",
+        .then(response => { dispatcher.emit("server response", response) })
+        .catch(err => { dispatcher.emit("error report send", err.code) })
+        dispatcher.emit("report sended",
         `corners: ${json.extra.cornersProcessed}\njson: ${body}\n\n`)
 
         this.photos = []
