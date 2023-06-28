@@ -5,6 +5,7 @@ class Detector {
 
     model
     predictions
+    WORKSPACE_RECT = [0, 0, 1600, 900]
 
     async loadModels() {
         if (!this.model) {
@@ -31,7 +32,6 @@ class Detector {
             } catch (error) {
                 console.log(error, 'setInterval error')
             }
-            // if (!this.predictions.w || !this.predictions.o) return
         } catch (e) {
             console.log(e, 'e')
         }

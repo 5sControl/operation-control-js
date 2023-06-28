@@ -35,13 +35,16 @@ class Operation {
         if (window) {
             this.window.bbox = window.bbox
             const [x, y, width, height] = this.window.bbox
-            this.window.edgeCorners = [[x, y+height], [x+width, y+height]]
+            this.window.edgeCorners = [[x, y+height], [x+width, y+height]] // передавать в whatSide window.bbox и внутри метода уже анализировать точки углов
         }
+
         if (full_w && !this.startTracking) {
 
-            // to Detector.isWindowDetected
+            ////// to Detector.isWindowDetected ////////////////////////////////////
+            /// внутренний метод выдачи detections только если его bbox входит в WORKSPACE_RECT
             const WORKSPACE_BOUNDARIES = [1600, 900]
             if (!withinWorkspace(this.window.bbox, WORKSPACE_BOUNDARIES)) return
+            ////////////////////////////////////////////////////////////////////////
 
             this.isBeginTimer++
             dispatcher.emit(`Worker with window appeared: ${this.isBeginTimer}s`)
@@ -56,6 +59,7 @@ class Operation {
     }
 
     async begin() {
+
         this.operationId = +new Date()
         this.startTracking = djangoDate(new Date())
         this.isBeginTimer = 0
@@ -66,7 +70,7 @@ class Operation {
 
     }
     async end() {
-        
+
         this.operationId = null
         this.stopTracking = djangoDate(new Date())
         this.isEndTimer = 0
@@ -92,17 +96,20 @@ class Operation {
         this.stopTracking = null
 
     }
-    async isCornerProcessed(isHKKdetected, action) { // ActionDetection
+    async isCornerProcessed(isHKKdetected, action) { // ActionDetectionBbox
 
         this.timeFromLastProcessedCorner++
 
         if (isHKKdetected) {
 
+            ////// to Detector.isWindowDetected ////////////////////////////////////
+            /// внутренний метод выдачи detections только если его bbox входит в WORKSPACE_RECT
             // also 2D (is hkk-rect in wspace-rect)
             const [x, y] = bBox.getOrigin(action.bbox)
             // to Detector.isWindowDetected
             const WORKSPACE_BOUNDARIES = [1600, 900]
             if (x < WORKSPACE_BOUNDARIES[0] && y < WORKSPACE_BOUNDARIES[1]) {
+            ////////////////////////////////////////////////////////////////////////
 
                 if (isOperationOnWindow(action.bbox, this.window.bbox)) {
                     this.hkkCounter++
