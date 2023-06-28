@@ -47,9 +47,11 @@ function withinWorkspace(bbox, rect) { // rect in another rect
 /**
  * @returns {"left" | "right"}
  */
-function whatSide(rect, corners) {
+function whatSide(rect, window_bbox) {
     if (rect !== null) {
         const operationOrigin = bBox.getOrigin(rect)
+        const [x, y, width, height] = window_bbox
+        const corners = [[x, y+height], [x+width, y+height]]
         if (operationOrigin) {
             const diffX = operationOrigin[0] - corners[0][0]
             const halfWindowWidth = (corners[1][0] - corners[0][0])/2

@@ -1,6 +1,6 @@
 const dispatcher = require('./Dispatcher')
 const {djangoDate} = require('./utils/Date')
-const {bBox, isOperationOnWindow, withinWorkspace, whatSide} = require('./utils/2D')
+const {isOperationOnWindow, whatSide} = require('./utils/2D')
 const Report = require('./Report')
 
 class Operation {
@@ -28,34 +28,20 @@ class Operation {
 
     report = new Report()
 
-    check(buffer, window, full_w, empty_w, isHKKdetected, action) {
-
+    check(buffer, { window_detection, detect_window_and_worker, detect_nothing, action_detection }) {
         this.buffer = buffer
-
-        if (window) {
-            this.window.bbox = window.bbox
-            const [x, y, width, height] = this.window.bbox
-            this.window.edgeCorners = [[x, y+height], [x+width, y+height]] // передавать в whatSide window.bbox и внутри метода уже анализировать точки углов
-        }
-
-        if (full_w && !this.startTracking) {
-
-            ////// to Detector.isWindowDetected ////////////////////////////////////
-            /// внутренний метод выдачи detections только если его bbox входит в WORKSPACE_RECT
-            const WORKSPACE_BOUNDARIES = [1600, 900]
-            if (!withinWorkspace(this.window.bbox, WORKSPACE_BOUNDARIES)) return
-            ////////////////////////////////////////////////////////////////////////
-
+        if (window_detection) this.window.bbox = window_detection.bbox
+        if (detect_window_and_worker && !this.startTracking) {
             this.isBeginTimer++
             dispatcher.emit(`Worker with window appeared: ${this.isBeginTimer}s`)
             if (this.isBeginTimer > 5) this.begin()
         }
-        if (empty_w && this.startTracking && !this.stopTracking) {
+        if (detect_nothing && this.startTracking && !this.stopTracking) {
             this.isEndTimer++
             dispatcher.emit(`Worker with window disappeared: ${this.isEndTimer}s`)
             if (this.isEndTimer > 5) this.end()
         }
-        if (this.startTracking) this.isCornerProcessed(isHKKdetected, action)
+        if (this.startTracking) this.isCornerProcessed(action_detection)
     }
 
     async begin() {
@@ -79,7 +65,6 @@ class Operation {
         this.timeFromLastProcessedCorner = 0
         this.hkkLast = null
 
-
         dispatcher.emit("End of operation")
         await this.report.add(this.buffer, "End of operation")
         this.report.send({
@@ -89,41 +74,25 @@ class Operation {
             operationType: this.cornersProcessed === 0 ? "unknown" : "cleaning corners"
         })
 
-
         this.cornersProcessed = 0
         this.cornersState = [false, false, false, false]
         this.startTracking = null
         this.stopTracking = null
 
     }
-    async isCornerProcessed(isHKKdetected, action) { // ActionDetectionBbox
-
+    async isCornerProcessed(action_detection) { // ActionDetection
         this.timeFromLastProcessedCorner++
-
-        if (isHKKdetected) {
-
-            ////// to Detector.isWindowDetected ////////////////////////////////////
-            /// внутренний метод выдачи detections только если его bbox входит в WORKSPACE_RECT
-            // also 2D (is hkk-rect in wspace-rect)
-            const [x, y] = bBox.getOrigin(action.bbox)
-            // to Detector.isWindowDetected
-            const WORKSPACE_BOUNDARIES = [1600, 900]
-            if (x < WORKSPACE_BOUNDARIES[0] && y < WORKSPACE_BOUNDARIES[1]) {
-            ////////////////////////////////////////////////////////////////////////
-
-                if (isOperationOnWindow(action.bbox, this.window.bbox)) {
-                    this.hkkCounter++
-                    this.hkkLast = action
-                } else {
-                    dispatcher.emit('hkk not on window!')
-                }
-
+        if (action_detection) {
+            if (isOperationOnWindow(action_detection.bbox, this.window.bbox)) {
+                this.hkkCounter++
+                this.hkkLast = action_detection
+            } else {
+                dispatcher.emit('hkk not on window!')
             }
-
         } else {
             if (this.hkkCounter >= 1) {
                 dispatcher.emit("Action performed")
-                const currentSide = whatSide(this.hkkLast.bbox, this.window.edgeCorners)
+                const currentSide = whatSide(this.hkkLast.bbox, this.window.bbox)
                 if (this.processedSide === null) {
                     dispatcher.emit("No side has been counted yet")
                     await this.addCleanedCorner(currentSide)

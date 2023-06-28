@@ -1,82 +1,56 @@
 const ModelWorker = require('./workers/ModelWorker')
 const Snapshot = require('../Snapshot')
+const {withinWorkspace} = require('../utils/2D')
 
 class Detector {
 
     model
-    predictions
+    detections
     WORKSPACE_RECT = [0, 0, 1600, 900]
 
     async loadModels() {
         if (!this.model) {
-            console.time(`models load`)
+            console.time(`detector models load`)
             this.model = {
                 w: new ModelWorker("ww"),
                 o: new ModelWorker("wo")
             }
-            console.timeEnd(`models load`)
+            console.timeEnd(`detector models load`)
         }
     }
-    async getPredictions(buffer) {
-        try {
-            this.predictions = null
-            try {
-                const prev = Date.now()
-                const [result_w, result_o] = await this.getWorkersPredictions([this.model.w, this.model.o], buffer)
-                this.predictions = {
-                    w: result_w,
-                    o: result_o
-                }
-                const now = Date.now()
-                console.log(`detection: ${now - prev}ms`)
-            } catch (error) {
-                console.log(error, 'setInterval error')
-            }
-        } catch (e) {
-            console.log(e, 'e')
-        }
-    }
-    async getWorkersPredictions(workers, buffer) {
-        const wnRes = await workers[0].exec(buffer)
-        let woRes = []
-        let worker = wnRes?.find(d => d.class === 'worker')
-        if (worker) {
+    async detect(buffer) {
+        console.time("detection")
+        const ww_detections = await this.model.w.exec(buffer) // YoloDetection[]
+        const window_detection = ww_detections.find(d => d.class === 'window' && d.score > 0.5 && withinWorkspace(d.bbox, [1600, 900]))
+        const worker_detection = ww_detections.find(d => d.class === 'worker' && d.score > 0.5)
+        const detect_window_and_worker = worker_detection && window_detection ? true : false
+        const detect_nothing = !worker_detection && !window_detection
+        let action_detection
+        if (worker_detection) {
             const snapshot = new Snapshot(buffer)
-            const workerBlob = await snapshot.cutRegionFromBlob(worker.bbox)
-            woRes = await workers[1].exec(workerBlob)
-            const OFFSET_X = worker.x
-            const OFFSET_Y = worker.y
-            woRes = woRes.map(d => {
-                d.x = d.x + OFFSET_X
-                d.y = d.y + OFFSET_Y
-                d.bbox[0] = d.x
-                d.bbox[1] = d.y
-                return d
-            })
-        }
-        return [wnRes, woRes]
-    }
-    /**
-     * @param {string[]} classes Classes to detect
-     * @param {number} minScore Minimum detection score
-     * @param {("array" | "boolean")} returnType What type to return
-     */
-    isAnyDetections(classes, returnType = "array", minScore = 0.5) {
-        const checkClass = prediction => classes === undefined ? true : classes.includes(prediction.class)
-        const isReturnArray = returnType === "array" ? true : false
-        let detection = isReturnArray ? [] : false
-        const predictions = isReturnArray ? this.predictions.w : this.predictions.o
-        try {
-            for (const prediction of predictions) {
-                if (checkClass(prediction) && prediction.score > minScore) {
-                    isReturnArray ? detection.push(prediction) : detection = true
-                }
+            const workerBlob = await snapshot.cutRegionFromBlob(worker_detection.bbox)
+            let wo_detections = await this.model.o.exec(workerBlob)
+            if (wo_detections[0]?.score > 0.9 && withinWorkspace(wo_detections[0]?.bbox, [1600, 900])) {
+                wo_detections = wo_detections.map(d => {
+                    d.x = d.x + worker_detection.x
+                    d.y = d.y + worker_detection.y
+                    d.bbox[0] = d.x
+                    d.bbox[1] = d.y
+                    return d
+                })
+                action_detection = wo_detections[0]
             }
-        } catch (error) {
-            console.log("isAnyDetections", error)
         }
-        return detection
+        console.timeEnd("detection")
+        this.detections = {
+            window_detection,
+            detect_window_and_worker,
+            detect_nothing,
+            action_detection // undefinde || YoloDetection
+        }
+        return this.detections
     }
+    
 }
 
 module.exports = Detector
