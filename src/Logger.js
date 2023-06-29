@@ -26,7 +26,7 @@ function EventRecord(eventName, payload) {
 }
 
 function txt(record) {
-    fs.writeFile(`debug/operation-control/${YMD(new Date())}/log.txt`, 
+    fs.writeFile(`${process.env.currentDebugFolder || `debug/operation-control/${YMD(new Date())}`}/log.txt`,
     record, { flag: 'a+' }, err => { 
         if (err) console.log("event not write to log", err)
     })

@@ -23,6 +23,15 @@ class Camera {
         }
     }
 
+    constructor() {
+        dispatcher.on("Begin of operation", () => {
+            console.log('from camera')
+        })
+        dispatcher.on("End of operation", () => {
+            console.log('End from camera')
+        })
+    }
+
     async getSnapshot() {
         try {
             if (process.env.isLocalDebug) {

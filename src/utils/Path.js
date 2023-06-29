@@ -26,4 +26,4 @@ function checkDirs(dirs) {
     }
 }
 
-module.exports = { checkDirs }
+module.exports = { isExists, checkDirs }
