@@ -1,4 +1,5 @@
 const fs = require('fs')
+const {YMD} = require('./utils/Date')
 
 function Timestamp() {
 	const date = new Date()
@@ -25,7 +26,7 @@ function EventRecord(eventName, payload) {
 }
 
 function txt(record) {
-    fs.writeFile('debug/operation-control/log.txt', 
+    fs.writeFile(`debug/operation-control/${YMD(new Date())}/log.txt`, 
     record, { flag: 'a+' }, err => { 
         if (err) console.log("event not write to log", err)
     })
