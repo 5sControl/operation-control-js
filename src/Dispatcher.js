@@ -15,6 +15,7 @@ const dispatcher = new Dispatcher()
 dispatcher.on("Begin of operation", () => {
     process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}/${HMS(new Date())}`
     isExists(process.env.currentDebugFolder)
+    isExists(process.env.currentDebugFolder + "/snapshots")
 })
 dispatcher.on("End of operation", () => {
     setTimeout(() => {
