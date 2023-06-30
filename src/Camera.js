@@ -1,6 +1,13 @@
 const dispatcher = require('./Dispatcher')
 const fs = require('fs')
 
+function arrayBufferToBuffer(arrayBuffer) {
+    const buffer = Buffer.alloc(arrayBuffer.byteLength)
+    const view = new Uint8Array(arrayBuffer)
+    for (let i = 0; i < buffer.length; ++i) buffer[i] = view[i]
+    return buffer
+}
+
 class Camera {
 
     snapshot = {
@@ -36,8 +43,10 @@ class Camera {
         try {
             // this.snapshot.saveLastLength()
             const response = await fetch(process.env.camera_url)
-            console.log(response)
-            this.snapshot.buffer.current = response
+            // console.log(response)
+            const arrayBuffer = await response.arrayBuffer()
+            this.snapshot.buffer.current = arrayBufferToBuffer(arrayBuffer)
+            // this.snapshot.buffer.current = response
             if (!this.snapshot.isExist()) {dispatcher.emit("snapshot null"); return}
             if (!this.snapshot.isCorrect()) {dispatcher.emit("snapshot broken", `buffer length is ${this.snapshot.buffer.current.length} \n`); return}
             // if (this.snapshot.isAnother()) {dispatcher.emit("snapshot same"); return}
