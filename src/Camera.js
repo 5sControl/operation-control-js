@@ -1,4 +1,5 @@
 const dispatcher = require('./Dispatcher')
+const fs = require('fs')
 
 class Camera {
 
@@ -23,10 +24,17 @@ class Camera {
         }
     }
 
+    isRecording = false
+    recordedSnapshots = 0
+    constructor() {
+        dispatcher.on("Begin of operation", () => this.isRecording = true)
+        dispatcher.on("End of operation", () => this.isRecording = false)
+        dispatcher.on("tick completed", () => {this.recordSnapshot()})
+    }
+
     async getSnapshot() {
         try {
             if (process.env.isLocalDebug) {
-                const fs = require('fs')
                 this.snapshot.buffer.current = fs.readFileSync('debug/snapshot.jpeg')
             } else {
                 const response = await fetch(process.env.camera_url)
@@ -38,9 +46,21 @@ class Camera {
             if (!this.snapshot.isCorrect()) {dispatcher.emit("snapshot broken", `buffer length is ${this.snapshot.buffer.current.length} \n`); return}
             this.snapshot.saveLastLength()
             dispatcher.emit("snapshot updated", false)
-            return this.snapshot.buffer
+            return this.snapshot.buffer.current
         } catch (error) {
             dispatcher.emit("snapshot update error", error)
+        }
+    }
+
+    recordSnapshot() {
+        if (this.recordedSnapshots < 600 && this.isRecording) {
+            this.recordedSnapshots++
+            fs.writeFile(`${process.env.currentDebugFolder + "/snapshots"}/${this.recordedSnapshots}.jpeg`, this.snapshot.buffer.current, error => {
+                if (error) console.log(error)
+            })
+        } else {
+            this.recordedSnapshots = 0
+            this.isRecording = false
         }
     }
 
