@@ -38,7 +38,6 @@ class Camera {
                 this.snapshot.buffer.current = fs.readFileSync('debug/snapshot.jpeg')
             } else {
                 const response = await fetch(process.env.camera_url)
-                console.log(response)
                 this.snapshot.buffer.current = response
             }
             if (!this.snapshot.isExist()) {dispatcher.emit("snapshot null"); return}
@@ -53,7 +52,7 @@ class Camera {
     }
 
     recordSnapshot() {
-        if (this.recordedSnapshots < 600 && this.isRecording) {
+        if (this.recordedSnapshots < 300 && this.isRecording) {
             this.recordedSnapshots++
             fs.writeFile(`${process.env.currentDebugFolder + "/snapshots"}/${this.recordedSnapshots}.jpeg`, this.snapshot.buffer.current, error => {
                 if (error) console.log(error)
