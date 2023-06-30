@@ -34,16 +34,13 @@ class Camera {
 
     async getSnapshot() {
         try {
-            if (process.env.isLocalDebug) {
-                this.snapshot.buffer.current = fs.readFileSync('debug/snapshot.jpeg')
-            } else {
-                const response = await fetch(process.env.camera_url)
-                this.snapshot.buffer.current = response
-            }
+            // this.snapshot.saveLastLength()
+            const response = await fetch(process.env.camera_url)
+            // console.log(response)
+            this.snapshot.buffer.current = response
             if (!this.snapshot.isExist()) {dispatcher.emit("snapshot null"); return}
-            if (!this.snapshot.isAnother()) {dispatcher.emit("snapshot same"); return}
             if (!this.snapshot.isCorrect()) {dispatcher.emit("snapshot broken", `buffer length is ${this.snapshot.buffer.current.length} \n`); return}
-            this.snapshot.saveLastLength()
+            // if (this.snapshot.isAnother()) {dispatcher.emit("snapshot same"); return}
             dispatcher.emit("snapshot updated", false)
             return this.snapshot.buffer.current
         } catch (error) {
