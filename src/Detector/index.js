@@ -19,7 +19,8 @@ class Detector {
         }
     }
     async detect(buffer) {
-        console.time("detection")
+        // console.time("detection")
+        const prev = Date.now()
         const ww_detections = await this.model.w.exec(buffer) // YoloDetection[]
         const window_detection = ww_detections.find(d => d.class === 'window' && d.score > 0.5 && withinWorkspace(d.bbox, [1600, 900]))
         const worker_detection = ww_detections.find(d => d.class === 'worker' && d.score > 0.5)
@@ -41,7 +42,9 @@ class Detector {
                 action_detection = wo_detections[0]
             }
         }
-        console.timeEnd("detection")
+        const now = Date.now()
+        console.log(`detection - ${now - prev}ms`)
+        // console.timeEnd("detection")
         this.detections = {
             window_detection,
             worker_detection,
