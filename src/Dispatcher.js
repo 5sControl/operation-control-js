@@ -12,12 +12,12 @@ class Dispatcher extends EventEmitter {
 
 const dispatcher = new Dispatcher()
 
-dispatcher.on("Begin of operation", () => {
+dispatcher.on("operation started", () => {
     process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}/${HMS(new Date())}`
     isExists(process.env.currentDebugFolder)
     isExists(process.env.currentDebugFolder + "/snapshots")
 })
-dispatcher.on("End of operation", () => {
+dispatcher.on("operation finished", () => {
     setTimeout(() => {
         process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}`
     }, 1000)

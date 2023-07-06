@@ -51,8 +51,8 @@ class Operation {
         this.isBeginTimer = 0
         this.window.currentSide = "first"
 
-        dispatcher.emit("Begin of operation")
-        this.report.add(this.buffer, "Begin of operation")
+        dispatcher.emit("operation started")
+        this.report.add(this.buffer, "operation started")
 
     }
     async end() {
@@ -65,8 +65,8 @@ class Operation {
         this.timeFromLastProcessedCorner = 0
         this.hkkLast = null
 
-        dispatcher.emit("End of operation")
-        await this.report.add(this.buffer, "End of operation")
+        dispatcher.emit("operation finished")
+        await this.report.add(this.buffer, "operation finished")
         this.report.send({
             cornersProcessed: this.cornersProcessed,
             startTracking: this.startTracking,

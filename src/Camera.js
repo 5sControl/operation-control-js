@@ -28,8 +28,8 @@ class Camera {
     isRecording = false
     recordedSnapshots = 0
     constructor() {
-        dispatcher.on("Begin of operation", () => this.isRecording = true)
-        dispatcher.on("End of operation", () => this.isRecording = false)
+        dispatcher.on("operation started", () => this.isRecording = true)
+        dispatcher.on("operation finished", () => this.isRecording = false)
         // dispatcher.on("tick completed", () => {this.recordSnapshot()})
     }
 
