@@ -54,16 +54,17 @@ class Camera {
             if (!this.snapshot.isAnother()) {dispatcher.emit("snapshot same"); return null}
             dispatcher.emit("snapshot updated", false)
             this.snapshot.saveLastLength()
+            this.recordSnapshot(this.snapshot.buffer.current)
             return this.snapshot.buffer.current
         } catch (error) {
             dispatcher.emit("snapshot update error", error)
         }
     }
 
-    recordSnapshot() {
+    recordSnapshot(buffer) {
         if (this.recordedSnapshots < 300 && this.isRecording) {
             this.recordedSnapshots++
-            fs.writeFile(`${process.env.currentDebugFolder + "/snapshots"}/${this.recordedSnapshots}.jpeg`, this.snapshot.buffer.current, error => {
+            fs.writeFile(`${process.env.currentDebugFolder + "/snapshots"}/${this.recordedSnapshots}.jpeg`, buffer, error => {
                 if (error) console.log(error)
             })
         } else {
