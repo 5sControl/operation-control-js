@@ -21,7 +21,7 @@ class Control {
             const detections = await this.detector.detect(checkBuffer)
             this.operation.check(checkBuffer, detections)
         }
-        dispatcher.emit("tick completed", false)
+        // dispatcher.emit("tick completed", false)
     }
 
 }
