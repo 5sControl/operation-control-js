@@ -1,7 +1,7 @@
 const {YMD} = require('./utils/Date')
 process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}`
 const {checkDirs} = require('./utils/Path')
-checkDirs(["images", process.env.folder, "debug/", "debug/operation-control", process.env.currentDebugFolder])
+checkDirs([process.env.folder, process.env.currentDebugFolder])
 
 const dispatcher = require('./Dispatcher')
 dispatcher.emit("container started", `camera_url: ${process.env.camera_url}

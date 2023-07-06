@@ -1,24 +1,10 @@
 // -------------- Paths and dirs
-const {accessSync, mkdirSync} = require('fs')
-function isExists(dir) {
-    try {
-        accessSync(dir)
-        console.log('Dir exists')
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            mkdirSync(dir)
-            console.log(dir, "created successfully... ")
-        }
-    }
-}
-/**
- * @param {string[]} dirs
- * @returns {true | ReferenceError} created folders or not
- */
+const {mkdirSync, existsSync} = require('fs')
+
 function checkDirs(dirs) {
     try {
         for (const dir of dirs) {
-            isExists(dir)
+            if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
         }
         return true
     } catch (error) {
@@ -26,4 +12,4 @@ function checkDirs(dirs) {
     }
 }
 
-module.exports = { isExists, checkDirs }
+module.exports = { checkDirs }

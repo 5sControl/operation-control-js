@@ -1,7 +1,7 @@
 const {EventEmitter} = require('events')
 const {logger} = require('./Logger')
 const {YMD, HMS} = require('./utils/Date')
-const {isExists} = require('./utils/Path')
+const {checkDirs} = require('./utils/Path')
 
 class Dispatcher extends EventEmitter {
     emit(event, payload) {
@@ -14,8 +14,7 @@ const dispatcher = new Dispatcher()
 
 dispatcher.on("operation started", () => {
     process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}/${HMS(new Date())}`
-    isExists(process.env.currentDebugFolder)
-    isExists(process.env.currentDebugFolder + "/snapshots")
+    checkDirs(process.env.currentDebugFolder)
 })
 dispatcher.on("operation finished", () => {
     setTimeout(() => {
