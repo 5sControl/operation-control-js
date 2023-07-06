@@ -19,15 +19,16 @@ class Camera {
         },
         saveLastLength() {
             this.buffer.previous.length = this.buffer.current?.length
+            console.log("old, new buffers:", this.buffer.previous.length, this.buffer.current?.length)
         },
         isExist() {
             return this.buffer.current !== null
         },
         isAnother() {
-            return this.buffer.current.length === this.buffer.previous.length
+            return this.buffer.current.length !== this.buffer.previous.length
         },
         isCorrect() {
-            return this.buffer.current.length > 300
+            return this.buffer.current.length > 300000
         }
     }
 
@@ -41,15 +42,13 @@ class Camera {
 
     async getSnapshot() {
         try {
-            // this.snapshot.saveLastLength()
+            this.snapshot.saveLastLength()
             const response = await fetch(process.env.camera_url)
-            // console.log(response)
             const arrayBuffer = await response.arrayBuffer()
             this.snapshot.buffer.current = arrayBufferToBuffer(arrayBuffer)
-            // this.snapshot.buffer.current = response
-            if (!this.snapshot.isExist()) {dispatcher.emit("snapshot null"); return}
-            if (!this.snapshot.isCorrect()) {dispatcher.emit("snapshot broken", `buffer length is ${this.snapshot.buffer.current.length} \n`); return}
-            // if (this.snapshot.isAnother()) {dispatcher.emit("snapshot same"); return}
+            if (!this.snapshot.isExist()) {dispatcher.emit("snapshot null"); return null}
+            if (!this.snapshot.isCorrect()) {dispatcher.emit("snapshot broken", `buffer length is ${this.snapshot.buffer.current.length} \n`); return null}
+            if (!this.snapshot.isAnother()) {dispatcher.emit("snapshot same"); return null}
             dispatcher.emit("snapshot updated", false)
             return this.snapshot.buffer.current
         } catch (error) {

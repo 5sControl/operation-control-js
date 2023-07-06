@@ -18,6 +18,7 @@ class Control {
     async check(bufferFromGer) {
         let checkBuffer = bufferFromGer ? bufferFromGer : await this.camera.getSnapshot()
         if (checkBuffer) {
+            console.log("checkBuffer: ", checkBuffer.length)
             const detections = await this.detector.detect(checkBuffer)
             this.operation.check(checkBuffer, detections)
         }
