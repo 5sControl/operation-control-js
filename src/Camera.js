@@ -47,7 +47,7 @@ class Camera {
             if (!this.snapshot.isAnother()) {dispatcher.emit("snapshot same"); return null}
             dispatcher.emit("snapshot updated", false)
             this.snapshot.saveLastLength()
-            this.recordSnapshot(this.snapshot.buffer.current)
+            // this.recordSnapshot(this.snapshot.buffer.current)
             return this.snapshot.buffer.current
         } catch (error) {
             dispatcher.emit("snapshot update error", error)

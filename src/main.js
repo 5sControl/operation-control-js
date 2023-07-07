@@ -1,5 +1,3 @@
-process.env.N_CPUS = require('os').cpus().length
-
 const {YMD} = require('./utils/Date')
 process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}`
 const {checkDirs} = require('./utils/Path')
