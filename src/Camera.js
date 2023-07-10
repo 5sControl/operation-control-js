@@ -11,7 +11,6 @@ class Camera {
             },
         },
         saveLastLength() {
-            // console.log("\nold, new buffers:", this.buffer.previous.length, this.buffer.current?.length)
             this.buffer.previous.length = this.buffer.current?.length
         },
         isExist() {
@@ -30,7 +29,6 @@ class Camera {
     constructor() {
         dispatcher.on("operation started", () => this.isRecording = true)
         dispatcher.on("operation finished", () => this.isRecording = false)
-        // dispatcher.on("tick completed", () => {this.recordSnapshot()})
     }
 
     async getSnapshot(bufferFromGer) {

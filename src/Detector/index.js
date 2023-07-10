@@ -1,16 +1,14 @@
 const ModelWorker = require('./workers/ModelWorker')
 const Snapshot = require('../Snapshot')
 const {withinWorkspace} = require('../utils/2D')
-const workerpool = require('workerpool')
 
 class Detector {
 
     model
     detections
     WORKSPACE_RECT = [0, 0, 1600, 900]
-    snapshotsProcessed = 0
-
-    async loadModels() {
+    
+    async init() {
         if (!this.model) {
             console.time(`detector models load`)
             this.model = {
@@ -58,7 +56,6 @@ class Detector {
         const result = await Promise.all(workers)
         const now = Date.now()
         console.log(`detection - ${now - prev}ms`)
-        console.log(result)
         return result
     }
     
