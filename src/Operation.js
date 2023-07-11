@@ -4,24 +4,42 @@ const {isOperationOnWindow, whatSide} = require('./utils/2D')
 
 class Operation {
 
-    // operation
     startTracking = null
     stopTracking = null
-    cornersProcessed = 0
-    // counters
+
     isBeginTimer = 0
     isEndTimer = 0
+    hkkCounter = 0
 
     window = {
         bbox: [], // Rect
         currentSide: "first", // "first", "second"
-        cornersState: [false, false, false, false]
+        cornersState: [false, false, false, false],
+        cornersProcessed: 0,
+        processedSide: null,
+        timeFromLastProcessedCorner: 0,
+        updateCornersState() {
+            let i = null
+            switch (this.currentSide) {
+                case "first":
+                    i = this.processedSide === "left" ? 0 : 1
+                    break
+                case "second":
+                    i = this.processedSide === "left" ? 2 : 3
+                    break
+            }
+            this.cornersState[i] = true
+        },
+        processCorner(processedSide) {
+            this.cornersProcessed++
+            this.processedSide = processedSide
+            this.timeFromLastProcessedCorner = 0
+            if (this.cornersProcessed === 3) this.currentSide = "second"
+            this.updateCornersState()    
+        }
     }
-    processedSide = null
-    timeFromLastProcessedCorner = 0
 
-    hkkCounter = 0
-    hkkLast = null
+    action_detection = null
 
     check(buffer, { window_detection, detect_window_and_worker, detect_nothing, action_detection }) {
         this.buffer = buffer
@@ -50,77 +68,61 @@ class Operation {
         this.stopTracking = djangoDate(new Date())
         this.isEndTimer = 0
 
-        this.processedSide = null
-        this.timeFromLastProcessedCorner = 0
-        this.hkkLast = null
+        this.window.processedSide = null
+        this.window.timeFromLastProcessedCorner = 0
+        this.action_detection = null
 
         dispatcher.emit("operation finished", {buffer: this.buffer, extra: {
-            cornersProcessed: this.cornersProcessed,
+            cornersProcessed: this.window.cornersProcessed,
             startTracking: this.startTracking,
             stopTracking: this.stopTracking,
-            operationType: this.cornersProcessed === 0 ? "unknown" : "cleaning corners"
+            operationType: this.window.cornersProcessed === 0 ? "unknown" : "cleaning corners"
         }})
 
-        this.cornersProcessed = 0
+        this.window.cornersProcessed = 0
         this.window.cornersState = [false, false, false, false]
         this.startTracking = null
         this.stopTracking = null
 
     }
     async isCornerProcessed(action_detection) { // ActionDetection
-        this.timeFromLastProcessedCorner++
+        this.window.timeFromLastProcessedCorner++
         if (action_detection) {
             if (isOperationOnWindow(action_detection.bbox, this.window.bbox)) {
                 this.hkkCounter++
-                this.hkkLast = action_detection
+                this.action_detection = action_detection
             } else {
                 dispatcher.emit('hkk not on window!')
             }
         } else {
             if (this.hkkCounter >= 1) {
                 dispatcher.emit("Action performed")
-                const currentSide = whatSide(this.hkkLast.bbox, this.window.bbox)
-                if (this.processedSide === null) {
+                const currentSide = whatSide(this.action_detection.bbox, this.window.bbox)
+                if (this.window.processedSide === null) {
                     dispatcher.emit("No side has been counted yet")
                     await this.addCleanedCorner(currentSide)
                 } else {
                     dispatcher.emit("Some angle was counted")
-                    if (currentSide === this.processedSide) {
-                        dispatcher.emit(`It was the same corner (${this.processedSide})`)
-                        if (this.timeFromLastProcessedCorner > 30) {
+                    if (currentSide === this.window.processedSide) {
+                        dispatcher.emit(`It was the same corner (${this.window.processedSide})`)
+                        if (this.window.timeFromLastProcessedCorner > 30) {
                             await this.addCleanedCorner(currentSide)
                             dispatcher.emit(`Same angle but more than 30 seconds`)
                         }
                     } else {
                         await this.addCleanedCorner(currentSide)
-                        dispatcher.emit(`It was a different angle (${this.processedSide})`)
+                        dispatcher.emit(`It was a different angle (${this.window.processedSide})`)
                     }
                 }
             }
             this.hkkCounter = 0
         }
     }
-
     async addCleanedCorner(processedSide) {
-        this.cornersProcessed++
-        this.processedSide = processedSide
-        this.timeFromLastProcessedCorner = 0
-        if (this.cornersProcessed === 3) this.window.currentSide = "second"
-        this.updateCornersState()
-        dispatcher.emit("corner processed", {buffer: this.buffer, cornersProcessed: this.cornersProcessed, window: this.window})
+        this.window.processCorner(processedSide)
+        dispatcher.emit("corner processed", {buffer: this.buffer, window: this.window})
     }
-    updateCornersState() {
-        let i = null
-        switch (this.window.currentSide) {
-            case "first":
-                i = this.processedSide === "left" ? 0 : 1
-                break
-            case "second":
-                i = this.processedSide === "left" ? 2 : 3
-                break
-        }
-        this.window.cornersState[i] = true
-    }
+
 }
 
 const operation = new Operation()

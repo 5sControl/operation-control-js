@@ -54,6 +54,6 @@ dispatcher.on("operation finished", async ({buffer, extra}) => {
     await report.add(buffer, "operation finished")
     report.send(extra)
 })
-dispatcher.on("corner processed", async ({buffer, cornersProcessed, window}) => {
-    report.add(buffer, `${cornersProcessed} corner processed`, window)
+dispatcher.on("corner processed", async ({buffer, window}) => {
+    report.add(buffer, `${window.cornersProcessed} corner processed`, window)
 })
