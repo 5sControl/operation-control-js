@@ -28,25 +28,15 @@ class Drawer {
         this.ctx.fillText(`${text}`, 50, 1030)
         this.buffer = await this.canvas.encode('jpeg', 50)
     }
-    async drawPoint(point, isCornerState = false, cornerState) {
+    async drawPoint(point, cornerState) {
         if (!this.ctx) this.createCtx()
         const [x, y] = point
-        if (isCornerState) {
-            if (cornerState) {
-                this.ctx.beginPath()
-                this.ctx.arc(x, y, 30, 0, 2 * Math.PI)
-                this.ctx.fillStyle = cornerState ? "#3AFF09" : "#E00606"
-                this.ctx.fill()
-                cornerState ? this.drawMark(x, y) : this.drawCross(x, y)
-            }
-        } else {            
+        if (cornerState) {
             this.ctx.beginPath()
-            this.ctx.arc(x, y, 10, 0, 2 * Math.PI)
-            this.ctx.fillStyle = "yellow"
+            this.ctx.arc(x, y, 30, 0, 2 * Math.PI)
+            this.ctx.fillStyle = cornerState ? "#3AFF09" : "#E00606"
             this.ctx.fill()
-            this.ctx.lineWidth = 5
-            this.ctx.strokeStyle = "red"
-            this.ctx.stroke()
+            cornerState ? this.drawMark(x, y) : this.drawCross(x, y)
         }
         this.buffer = await this.canvas.encode('jpeg', 100)
     }
@@ -97,7 +87,7 @@ class Drawer {
         let points = []
         points = currentSide === "first" ? [p1,p2,p3,p4] : [p3,p4,p1,p2]
         let promises = []
-        points.forEach(async (point, i) => promises.push(this.drawPoint(point, true, cornersState[i])))
+        points.forEach(async (point, i) => promises.push(this.drawPoint(point, cornersState[i])))
         await Promise.all(promises)
         this.buffer = await this.canvas.encode('jpeg', 50)
     }
