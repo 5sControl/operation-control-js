@@ -1,5 +1,4 @@
 const dispatcher = require('./Dispatcher')
-const fs = require('fs')
 
 class Translation {
 
@@ -27,7 +26,6 @@ class Translation {
         }
         return buffer
     }
-
     async update(bufferFromGer) {
         try {
             let receivedBuffer
@@ -48,24 +46,7 @@ class Translation {
             dispatcher.emit("snapshot update error", error)
         }
     }
-
-    isRecording = false
-    recordedSnapshots = 0
-    recordSnapshot(buffer) {
-        if (this.recordedSnapshots < 300 && this.isRecording) {
-            this.recordedSnapshots++
-            fs.writeFile(`${process.env.currentDebugFolder + "/snapshots"}/${this.recordedSnapshots}.jpeg`, buffer, error => {
-                if (error) console.log(error)
-            })
-        } else {
-            this.recordedSnapshots = 0
-            this.isRecording = false
-        }
-    }
-
     constructor() {
-        dispatcher.on("operation started", () => this.isRecording = true)
-        dispatcher.on("operation finished", () => this.isRecording = false)
         if (!process.env.isDebugger) setInterval(() => this.update(), 1000)
     }
 
