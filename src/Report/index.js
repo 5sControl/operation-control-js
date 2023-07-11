@@ -61,7 +61,6 @@ class Report {
     }
 
 }
-
-const report = new Report()
+new Report()
 
 module.exports = Report
