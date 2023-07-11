@@ -18,7 +18,7 @@ class Report {
      * @returns {string} imagePath
      */
     upload(buffer) {
-        const imagePath = `${process.env.folder || "images/undefined"}/${crypto.randomUUID()}.jpeg`
+        const imagePath = `${process.env.folder}/${crypto.randomUUID()}.jpeg`
         fs.writeFile(
             imagePath,
             buffer,
