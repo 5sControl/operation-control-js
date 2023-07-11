@@ -19,7 +19,7 @@ N_CPUS: ${process.env.N_CPUS}
 `)
 
 // let batch = []
-dispatcher.on("snapshot updated", async (_, buffer) => {
+dispatcher.on("translation updated", async (_, buffer) => {
     const detections = await detector.detect(buffer)
     operation.check(buffer, detections)
     //     this.batch.push(checkBuffer)

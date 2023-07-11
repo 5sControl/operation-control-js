@@ -13,15 +13,15 @@ class Translation {
     }
     check(buffer) {
         if (buffer === null) {
-            dispatcher.emit("snapshot null")
+            dispatcher.emit("translation get null buffer")
             return null
         }
         if (buffer < 300000) {
-            dispatcher.emit("snapshot broken", `buffer length is ${buffer.length} \n`)
+            dispatcher.emit("translation get broken buffer", `buffer length is ${buffer.length} \n`)
             return null
         }
         if (buffer.length === this.buffer.current?.length) {
-            dispatcher.emit("snapshot same")
+            dispatcher.emit("translation get same buffer")
             return null
         }
         return buffer
@@ -40,10 +40,10 @@ class Translation {
             if (checkedBuffer) {
                 this.buffer.saveLastLength()
                 this.buffer.current = checkedBuffer
-                dispatcher.emit("snapshot updated", false, this.buffer.current)
+                dispatcher.emit("translation updated", false, this.buffer.current)
             }
         } catch (error) {
-            dispatcher.emit("snapshot update error", error)
+            dispatcher.emit("translation update error", error)
         }
     }
     constructor() {
