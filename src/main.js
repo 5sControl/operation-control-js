@@ -9,6 +9,7 @@ checkDirs([process.env.folder, process.env.currentDebugFolder])
 const detector = require('./Detector')
 const operation = require('./Operation')
 const translation = require('./Translation')
+require('./Report')
 
 dispatcher.emit("container started", { message: `
 camera_url: ${process.env.camera_url}

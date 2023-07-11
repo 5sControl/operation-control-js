@@ -1,8 +1,8 @@
 const fs = require('fs')
 const crypto = require('crypto')
-const dispatcher = require('./Dispatcher')
+const dispatcher = require('../Dispatcher')
 const Drawer = require('./Drawer')
-const {djangoDate} = require('./utils/Date')
+const {djangoDate} = require('../utils/Date')
 
 class Report {
 
@@ -53,6 +53,19 @@ class Report {
 
     }
 
+    constructor() {
+        dispatcher.on("operation started", ({buffer}) => this.add(buffer, "operation started"))
+        dispatcher.on("operation finished", async ({buffer, extra}) => {
+            await this.add(buffer, "operation finished")
+            this.send(extra)
+        })
+        dispatcher.on("corner processed", async ({buffer, cornersProcessed, window}) => {
+            this.add(buffer, `${cornersProcessed} corner processed`, window)
+        })
+    }
+
 }
+
+const report = new Report()
 
 module.exports = Report

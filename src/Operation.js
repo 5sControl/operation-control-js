@@ -1,7 +1,6 @@
 const dispatcher = require('./Dispatcher')
 const {djangoDate} = require('./utils/Date')
 const {isOperationOnWindow, whatSide} = require('./utils/2D')
-const Report = require('./Report')
 
 class Operation {
 
@@ -25,8 +24,6 @@ class Operation {
     hkkCounter = 0
     hkkLast = null
 
-    report = new Report()
-
     check(buffer, { window_detection, detect_window_and_worker, detect_nothing, action_detection }) {
         this.buffer = buffer
         if (window_detection) this.window.bbox = window_detection.bbox
@@ -44,15 +41,11 @@ class Operation {
     }
 
     async begin() {
-
         this.operationId = +new Date()
         this.startTracking = djangoDate(new Date())
         this.isBeginTimer = 0
         this.window.currentSide = "first"
-
-        dispatcher.emit("operation started")
-        this.report.add(this.buffer, "operation started")
-
+        dispatcher.emit("operation started", {buffer: this.buffer})
     }
     async end() {
 
@@ -64,20 +57,17 @@ class Operation {
         this.timeFromLastProcessedCorner = 0
         this.hkkLast = null
 
-        await this.report.add(this.buffer, "operation finished")
-        this.report.send({
+        dispatcher.emit("operation finished", {buffer: this.buffer, extra: {
             cornersProcessed: this.cornersProcessed,
             startTracking: this.startTracking,
             stopTracking: this.stopTracking,
             operationType: this.cornersProcessed === 0 ? "unknown" : "cleaning corners"
-        })
+        }})
 
         this.cornersProcessed = 0
         this.window.cornersState = [false, false, false, false]
         this.startTracking = null
         this.stopTracking = null
-
-        dispatcher.emit("operation finished")
 
     }
     async isCornerProcessed(action_detection) { // ActionDetection
@@ -120,10 +110,7 @@ class Operation {
         this.timeFromLastProcessedCorner = 0
         if (this.cornersProcessed === 3) this.window.currentSide = "second"
         this.updateCornersState()
-
-        dispatcher.emit("Corner processed")
-        this.report.add(this.buffer, `${this.cornersProcessed} corner processed`, this.window)
-
+        dispatcher.emit("corner processed", {buffer: this.buffer, cornersProcessed: this.cornersProcessed, window: this.window})
     }
     updateCornersState() {
         let i = null
