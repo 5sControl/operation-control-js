@@ -40,13 +40,16 @@ class Drawer {
         }
         this.buffer = await this.canvas.encode('jpeg', 100)
     }
-    drawCross(x, y) {
-        const box = {
+    setBox(x, y) {
+        return {
             x: x - 15,
             y: y - 15,
             width: x - 15 + 30,
             height: y - 15 + 30
         }
+    }
+    drawCross(x, y) {
+        const box = this.setBox(x, y)
         this.ctx.lineWidth = 7
         this.ctx.strokeStyle = "white"
         this.ctx.beginPath()
@@ -59,12 +62,7 @@ class Drawer {
         this.ctx.stroke()
     }
     drawMark(x, y) {
-        const box = {
-            x: x - 15,
-            y: y - 15,
-            width: x - 15 + 30,
-            height: y - 15 + 30
-        }
+        const box = this.setBox(x, y)
         this.ctx.lineWidth = 7
         this.ctx.strokeStyle = "white"
         this.ctx.beginPath()
