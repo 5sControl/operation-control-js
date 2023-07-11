@@ -7,6 +7,9 @@ class Translation {
         current: null,
         previous: {
             length: 0
+        },
+        saveLastLength() {
+            this.previous.length = this.current?.length
         }
     }
     check(buffer) {
@@ -24,9 +27,6 @@ class Translation {
         }
         return buffer
     }
-    saveLastLength() {
-        this.buffer.previous.length = this.buffer.current?.length
-    }
 
     async update(bufferFromGer) {
         try {
@@ -40,7 +40,7 @@ class Translation {
             }
             const checkedBuffer = this.check(receivedBuffer)
             if (checkedBuffer) {
-                this.saveLastLength()
+                this.buffer.saveLastLength()
                 this.buffer.current = checkedBuffer
                 dispatcher.emit("snapshot updated", false, this.buffer.current)
             }
