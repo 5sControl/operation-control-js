@@ -6,7 +6,6 @@ const dispatcher = require('../Dispatcher')
 class Detector {
 
     model
-    detections
     WORKSPACE_RECT = [0, 0, 1600, 900]
     
     constructor() {
@@ -40,14 +39,13 @@ class Detector {
                 action_detection = wo_detections[0]
             }
         }
-        this.detections = {
+        return {
             window_detection,
             worker_detection,
             detect_window_and_worker,
             detect_nothing,
             action_detection // undefined || YoloDetection
         }
-        dispatcher.emit("detections ready", { detections: this.detections, buffer, notForConsole: true })
     }
     /**
      * @returns {Blob}
@@ -71,17 +69,17 @@ class Detector {
         const croppedBlob = await newCan.encode('jpeg', 90)
         return croppedBlob
     }
-    async detectBatch(batch) {
+    async detectBatch(buffersBatch) {
         const prev = Date.now()
         let workers = []
-        batch.forEach(buffer => workers.push(this.detect(buffer)))
-        const result = await Promise.all(workers)
+        buffersBatch.forEach(buffer => workers.push(this.detect(buffer)))
+        const detectionsBatch = await Promise.all(workers)
         const now = Date.now()
-        console.log(`detection - ${now - prev}ms`)
-        return result
+        console.log(`batch detection - ${now - prev}ms`)
+        dispatcher.emit("batch detections ready", { detectionsBatch, buffersBatch, notForConsole: true })
     }
     
 }
 
 const detector = new Detector()
-dispatcher.on("translation updated", async ({buffer}) => await detector.detect(buffer))
+dispatcher.on("batch ready", async ({batch}) => {detector.detectBatch(batch)})

@@ -9,6 +9,7 @@ checkDirs([process.env.folder, process.env.currentDebugFolder])
 require('./Detector')
 require('./Control')
 require('./Report')
+require('./Batch')
 const translation = require('./Translation')
 
 dispatcher.emit("container started", { message: `
