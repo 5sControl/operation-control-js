@@ -4,9 +4,9 @@ const {YMD, HMS} = require('./utils/Date')
 const {checkDirs} = require('./utils/Path')
 
 class Dispatcher extends EventEmitter {
-    emit(event, payload) {
-        super.emit(event)
-        if (payload !== false) logger(event, payload)
+    emit(event, ...payload) {
+        super.emit(event, ...payload)
+        if (payload[0] !== false) logger(event, ...payload)
     }
 }
 

@@ -1,7 +1,7 @@
 const dispatcher = require('./Dispatcher')
 const fs = require('fs')
 
-class Camera {
+class Translation {
 
     snapshot = {
         buffer: {
@@ -23,15 +23,8 @@ class Camera {
             return this.buffer.current.length > 300000
         }
     }
-
-    isRecording = false
-    recordedSnapshots = 0
-    constructor() {
-        dispatcher.on("operation started", () => this.isRecording = true)
-        dispatcher.on("operation finished", () => this.isRecording = false)
-    }
-
-    async getSnapshot(bufferFromGer) {
+    // snapshot/translation.update()
+    async update(bufferFromGer) {
         try {
             if (bufferFromGer) {
                 this.snapshot.buffer.current = bufferFromGer
@@ -40,18 +33,21 @@ class Camera {
                 const arrayBuffer = await response.arrayBuffer()
                 this.snapshot.buffer.current = Buffer.from(arrayBuffer)
             }
+
+            // snapshot.check()
             if (!this.snapshot.isExist()) {dispatcher.emit("snapshot null"); return null}
             if (!this.snapshot.isCorrect()) {dispatcher.emit("snapshot broken", `buffer length is ${this.snapshot.buffer.current.length} \n`); return null}
             if (!this.snapshot.isAnother()) {dispatcher.emit("snapshot same"); return null}
-            dispatcher.emit("snapshot updated", false)
+
             this.snapshot.saveLastLength()
             // this.recordSnapshot(this.snapshot.buffer.current)
-            return this.snapshot.buffer.current
+            dispatcher.emit("snapshot updated", false, this.snapshot.buffer.current)
         } catch (error) {
             dispatcher.emit("snapshot update error", error)
         }
     }
-
+    isRecording = false
+    recordedSnapshots = 0
     recordSnapshot(buffer) {
         if (this.recordedSnapshots < 300 && this.isRecording) {
             this.recordedSnapshots++
@@ -64,6 +60,16 @@ class Camera {
         }
     }
 
+    constructor() {
+        dispatcher.on("operation started", () => this.isRecording = true)
+        dispatcher.on("operation finished", () => this.isRecording = false)
+        // this.type = "by_network"
+        this.type = "by_debugger"
+        if (this.type === "by_network") setInterval(() => this.update(), 1000)
+    }
+
 }
 
-module.exports = Camera
+const translation = new Translation()
+
+module.exports = translation

@@ -8,7 +8,7 @@ class Detector {
     detections
     WORKSPACE_RECT = [0, 0, 1600, 900]
     
-    async init() {
+    constructor() {
         if (!this.model) {
             console.time(`detector models load`)
             this.model = {
@@ -61,4 +61,6 @@ class Detector {
     
 }
 
-module.exports = Detector
+const detector = new Detector()
+
+module.exports = detector

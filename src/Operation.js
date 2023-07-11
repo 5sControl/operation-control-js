@@ -139,4 +139,6 @@ class Operation {
     }
 }
 
-module.exports = Operation
+const operation = new Operation()
+
+module.exports = operation
