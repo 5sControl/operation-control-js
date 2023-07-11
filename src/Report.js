@@ -30,7 +30,7 @@ class Report {
         
         const json = {
             "algorithm": "operation_control",
-            "camera": process.env.folder?.split("/")[1] || undefined,
+            "camera": process.env.folder?.split("/")[1],
             "start_tracking": this.photos[0].date,
             "stop_tracking": this.photos[this.photos.length - 1].date,
             "photos": this.photos,
@@ -47,8 +47,7 @@ class Report {
         .then(r => r.text())
         .then(response => { dispatcher.emit("server response", response) })
         .catch(err => { dispatcher.emit("error report send", err.code) })
-        dispatcher.emit("report sended",
-        `corners: ${json.extra.cornersProcessed}\njson: ${body}\n\n`)
+        dispatcher.emit("report sended", `corners: ${json.extra.cornersProcessed}\njson: ${body}\n\n`)
 
         this.photos = []
 
