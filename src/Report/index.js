@@ -26,18 +26,16 @@ class Report {
         )
         return imagePath
     }
-    send(controlPayload) {
-        
+    send(extra) {
         const json = {
             "algorithm": "operation_control",
             "camera": process.env.folder?.split("/")[1],
             "start_tracking": this.photos[0].date,
             "stop_tracking": this.photos[this.photos.length - 1].date,
             "photos": this.photos,
-            "violation_found": controlPayload.cornersProcessed !== 4,
-            "extra": controlPayload
+            "violation_found": extra.cornersProcessed !== 4,
+            "extra": extra
         }
-        
         const body = JSON.stringify(json, null, 2)
         fetch(`${process.env.server_url}:80/api/reports/report-with-photos/`, {
             method: "POST",
@@ -48,9 +46,7 @@ class Report {
         .then(response => { dispatcher.emit("server response", {message: response}) })
         .catch(err => { dispatcher.emit("error report send", {message: err.code}) })
         dispatcher.emit("report sended", {message: `corners: ${json.extra.cornersProcessed}\njson: ${body}\n\n`})
-
         this.photos = []
-
     }
 
     constructor() {
