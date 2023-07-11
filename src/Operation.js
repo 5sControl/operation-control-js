@@ -5,7 +5,6 @@ const {isOperationOnWindow, whatSide} = require('./utils/2D')
 class Operation {
 
     // operation
-    operationId = null
     startTracking = null
     stopTracking = null
     cornersProcessed = 0
@@ -41,7 +40,6 @@ class Operation {
     }
 
     async begin() {
-        this.operationId = +new Date()
         this.startTracking = djangoDate(new Date())
         this.isBeginTimer = 0
         this.window.currentSide = "first"
@@ -49,7 +47,6 @@ class Operation {
     }
     async end() {
 
-        this.operationId = null
         this.stopTracking = djangoDate(new Date())
         this.isEndTimer = 0
 
