@@ -4,15 +4,14 @@ const dispatcher = require('../Dispatcher')
 const Drawer = require('./Drawer')
 const {djangoDate} = require('../utils/Date')
 
-class Report {
-
-    photos = []
+const report = {
+    photos: [],
     async add(buffer, eventName, window) {
         let drawedBuffer = await new Drawer(buffer, eventName).draw(window)
         const imagePath = this.upload(drawedBuffer)
         const photoRecord = {"image": imagePath, "date": djangoDate(new Date())}
         this.photos.push(photoRecord)
-    }
+    },
     /**
      * @param {Buffer} buffer from Drawer
      * @returns {string} imagePath
@@ -25,7 +24,7 @@ class Report {
             error => { if (error) console.log(error) }
         )
         return imagePath
-    }
+    },
     send(extra) {
         const json = {
             "algorithm": "operation_control",
@@ -48,17 +47,13 @@ class Report {
         dispatcher.emit("report sended", {message: `corners: ${json.extra.cornersProcessed}\njson: ${body}\n\n`})
         this.photos = []
     }
-
-    constructor() {
-        dispatcher.on("operation started", ({buffer}) => this.add(buffer, "operation started"))
-        dispatcher.on("operation finished", async ({buffer, extra}) => {
-            await this.add(buffer, "operation finished")
-            this.send(extra)
-        })
-        dispatcher.on("corner processed", async ({buffer, cornersProcessed, window}) => {
-            this.add(buffer, `${cornersProcessed} corner processed`, window)
-        })
-    }
-
 }
-new Report()
+
+dispatcher.on("operation started", ({buffer}) => report.add(buffer, "operation started"))
+dispatcher.on("operation finished", async ({buffer, extra}) => {
+    await report.add(buffer, "operation finished")
+    report.send(extra)
+})
+dispatcher.on("corner processed", async ({buffer, cornersProcessed, window}) => {
+    report.add(buffer, `${cornersProcessed} corner processed`, window)
+})
