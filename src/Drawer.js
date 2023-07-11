@@ -1,9 +1,7 @@
-const {djangoDate} = require('./utils/Date')
 const {createCanvas, Image} = require('@napi-rs/canvas')
 
-class Snapshot {
+class Drawer {
     constructor(buffer) {
-        this.createdAt = djangoDate(new Date())
         this.buffer = buffer
     }
     createCtx() {
@@ -98,4 +96,4 @@ class Snapshot {
     
 }
 
-module.exports = Snapshot
+module.exports = Drawer

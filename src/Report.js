@@ -1,24 +1,24 @@
 const fs = require('fs')
 const crypto = require('crypto')
 const dispatcher = require('./Dispatcher')
-const Snapshot = require('./Snapshot')
+const Drawer = require('./Drawer')
 const {djangoDate} = require('./utils/Date')
 
 class Report {
 
     photos = []
     async add(buffer, event, isDrawCornersState = false, bbox, cornersState, currentSide) {
-        const snapshot = await this.draw(buffer, event, isDrawCornersState, bbox, cornersState, currentSide)
-        const imagePath = this.upload(snapshot.buffer)
+        const drawer = await this.draw(buffer, event, isDrawCornersState, bbox, cornersState, currentSide)
+        const imagePath = this.upload(drawer.buffer)
         const photoRecord = {"image": imagePath, "date": djangoDate(new Date())}
         this.photos.push(photoRecord)
     }
     async draw(buffer, event, isDrawCornersState, bbox, cornersState, currentSide) {
-        let snapshot = new Snapshot(buffer)
-        let promises = [snapshot.drawEvent(event)]
-        if (isDrawCornersState) promises.push(snapshot.drawCornersState(bbox, cornersState, currentSide))
+        let drawer = new Drawer(buffer)
+        let promises = [drawer.drawEvent(event)]
+        if (isDrawCornersState) promises.push(drawer.drawCornersState(bbox, cornersState, currentSide))
         await Promise.all(promises)
-        return snapshot
+        return drawer
     }
     /**
      * @param {Buffer} buffer from Camera or Canvas
