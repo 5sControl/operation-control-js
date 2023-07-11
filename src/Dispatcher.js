@@ -1,10 +1,14 @@
 const {EventEmitter} = require('events')
-const {logger} = require('./Logger')
+const {Timestamp} = require('./utils/Date')
 
 class Dispatcher extends EventEmitter {
-    emit(event, options) {
-        super.emit(event, options)
-        if (!options?.notForConsole) logger(event, options?.message)
+    emit(eventName, options) {
+        super.emit(eventName, options)
+        if (!options?.notForConsole) {
+            const message = options?.message
+            const record = `${Timestamp()}: ${eventName}${message ? `\n${message}` : "" }`
+            console.log(`\x1b[34m%s\x1b[0m`, record)        
+        }
     }
 }
 
