@@ -19,19 +19,9 @@ N_CPUS: ${process.env.N_CPUS}
 `
 })
 
-// let batch = []
 dispatcher.on("translation updated", async ({buffer}) => {
     const detections = await detector.detect(buffer)
     operation.check(buffer, detections)
-    //     this.batch.push(checkBuffer)
-    //     if (this.batch.length === +process.env.N_CPUS) {
-    //         console.log("detect batch")
-    //         const batchCopy = [...this.batch]
-    //         this.batch = []
-    //         const result = this.detector.detectBatch(batchCopy)
-    //         console.log(result)
-    //         // this.operation.check(checkBuffer, detections)
-    //     }
 })
 
 module.exports = {translation}
