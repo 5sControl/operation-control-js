@@ -2,7 +2,7 @@ const dispatcher = require('./Dispatcher')
 const {djangoDate} = require('./utils/Date')
 const {isOperationOnWindow, whatSide} = require('./utils/2D')
 
-class Operation {
+class Control {
 
     startTracking = null
     stopTracking = null
@@ -125,6 +125,6 @@ class Operation {
 
 }
 
-const operation = new Operation()
+const control = new Control()
 
-module.exports = operation
+module.exports = control

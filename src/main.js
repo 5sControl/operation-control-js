@@ -7,7 +7,7 @@ process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}`
 checkDirs([process.env.folder, process.env.currentDebugFolder])
 
 const detector = require('./Detector')
-const operation = require('./Operation')
+const control = require('./Control')
 const translation = require('./Translation')
 require('./Report')
 
@@ -22,7 +22,7 @@ N_CPUS: ${process.env.N_CPUS}
 
 dispatcher.on("translation updated", async ({buffer}) => {
     const detections = await detector.detect(buffer)
-    operation.check(buffer, detections)
+    control.check(buffer, detections)
 })
 
 module.exports = {translation}
