@@ -25,16 +25,8 @@ function EventRecord(eventName, payload) {
     return `${Timestamp()}: ${eventName}${payload ? `\n${payload}` : "" }`
 }
 
-function txt(record) {
-    fs.writeFile(`${process.env.currentDebugFolder || `debug/operation-control/${YMD(new Date())}`}/log.txt`,
-    record, { flag: 'a+' }, err => { 
-        if (err) console.log("event not write to log", err)
-    })
-}
-
 function logger(eventName, payload = "") {
     const record = EventRecord(eventName, payload)
-    // txt(record + "\n")
     console.log(`\x1b[34m%s\x1b[0m`, record)
     return eventName
 }
