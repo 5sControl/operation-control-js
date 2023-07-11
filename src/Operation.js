@@ -16,12 +16,11 @@ class Operation {
 
     window = {
         bbox: [], // Rect
-        edgeCorners: [null, null], // [Point, Point], left and right of current side
-        currentSide: "first" // "first", "second"
+        currentSide: "first", // "first", "second"
+        cornersState: [false, false, false, false]
     }
     processedSide = null
     timeFromLastProcessedCorner = 0
-    cornersState = [false, false, false, false]
 
     hkkCounter = 0
     hkkLast = null
@@ -74,7 +73,7 @@ class Operation {
         })
 
         this.cornersProcessed = 0
-        this.cornersState = [false, false, false, false]
+        this.window.cornersState = [false, false, false, false]
         this.startTracking = null
         this.stopTracking = null
 
@@ -123,7 +122,7 @@ class Operation {
         this.updateCornersState()
 
         dispatcher.emit("Corner processed")
-        this.report.add(this.buffer, `${this.cornersProcessed} corner processed`, true, this.window.bbox, this.cornersState, this.window.currentSide)
+        this.report.add(this.buffer, `${this.cornersProcessed} corner processed`, this.window)
 
     }
     updateCornersState() {
@@ -136,7 +135,7 @@ class Operation {
                 i = this.processedSide === "left" ? 2 : 3
                 break
         }
-        this.cornersState[i] = true
+        this.window.cornersState[i] = true
     }
 }
 

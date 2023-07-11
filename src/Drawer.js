@@ -1,12 +1,13 @@
 const {createCanvas, Image} = require('@napi-rs/canvas')
 
 class Drawer {
-    constructor(buffer) {
+    constructor(buffer, eventName) {
         this.buffer = buffer
+        this.eventName = eventName
     }
-    async draw(event, isDrawCornersState, bbox, cornersState, currentSide) {
-        let promises = [this.drawEvent(event)]
-        if (isDrawCornersState) promises.push(this.drawCornersState(bbox, cornersState, currentSide))
+    async draw(window) {
+        let promises = [this.drawEvent(this.eventName)]
+        if (window) promises.push(this.drawCornersState(window))
         await Promise.all(promises)
         return this.buffer
     }
@@ -85,7 +86,8 @@ class Drawer {
         this.ctx.lineTo(box.width - 19, box.height)
         this.ctx.stroke()
     }
-    async drawCornersState(bbox, state, side) {
+    async drawCornersState(window) {
+        const {bbox, cornersState, currentSide} = window
         if (!this.ctx) this.createCtx()
         const [x, y, width, height] = bbox
         const p1 = [x, y+height]
@@ -93,9 +95,9 @@ class Drawer {
         const p3 = [x, y]
         const p4 = [x+width, y]
         let points = []
-        points = side === "first" ? [p1,p2,p3,p4] : [p3,p4,p1,p2]
+        points = currentSide === "first" ? [p1,p2,p3,p4] : [p3,p4,p1,p2]
         let promises = []
-        points.forEach(async (point, i) => promises.push(this.drawPoint(point, true, state[i])))
+        points.forEach(async (point, i) => promises.push(this.drawPoint(point, true, cornersState[i])))
         await Promise.all(promises)
         this.buffer = await this.canvas.encode('jpeg', 50)
     }

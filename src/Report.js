@@ -7,14 +7,14 @@ const {djangoDate} = require('./utils/Date')
 class Report {
 
     photos = []
-    async add(buffer, event, isDrawCornersState = false, bbox, cornersState, currentSide) {
-        let drawedBuffer = await new Drawer(buffer).draw(event, isDrawCornersState, bbox, cornersState, currentSide)
+    async add(buffer, eventName, window) {
+        let drawedBuffer = await new Drawer(buffer, eventName).draw(window)
         const imagePath = this.upload(drawedBuffer)
         const photoRecord = {"image": imagePath, "date": djangoDate(new Date())}
         this.photos.push(photoRecord)
     }
     /**
-     * @param {Buffer} buffer from Camera or Canvas
+     * @param {Buffer} buffer from Drawer
      * @returns {string} imagePath
      */
     upload(buffer) {
