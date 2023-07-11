@@ -36,7 +36,7 @@ class Drawer {
             this.ctx.arc(x, y, 30, 0, 2 * Math.PI)
             this.ctx.fillStyle = cornerState ? "#3AFF09" : "#E00606"
             this.ctx.fill()
-            cornerState ? this.drawMark(x, y) : this.drawCross(x, y)
+            this.drawSymbol(x, y, cornerState ? "mark" : "cross")
         }
         this.buffer = await this.canvas.encode('jpeg', 100)
     }
@@ -48,30 +48,24 @@ class Drawer {
             height: y - 15 + 30
         }
     }
-    drawCross(x, y) {
+    /**
+     * 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {"cross"|"mark"} type 
+     */
+    drawSymbol(x, y, type) {
         const box = this.setBox(x, y)
+        const OFFSET = type === "cross" ? [0,0,0,0] : [17, 15, 2, 11]
         this.ctx.lineWidth = 7
         this.ctx.strokeStyle = "white"
         this.ctx.beginPath()
-        this.ctx.moveTo(box.x, box.y)
-        this.ctx.lineTo(box.width, box.height)
+        this.ctx.moveTo(box.x, box.y + OFFSET[0])
+        this.ctx.lineTo(box.width - OFFSET[1], box.height)
         this.ctx.stroke()
         this.ctx.beginPath()
-        this.ctx.moveTo(box.width, box.y)
-        this.ctx.lineTo(box.x, box.height)
-        this.ctx.stroke()
-    }
-    drawMark(x, y) {
-        const box = this.setBox(x, y)
-        this.ctx.lineWidth = 7
-        this.ctx.strokeStyle = "white"
-        this.ctx.beginPath()
-        this.ctx.moveTo(box.x, box.y + 17)
-        this.ctx.lineTo(box.width - 15, box.height)
-        this.ctx.stroke()
-        this.ctx.beginPath()
-        this.ctx.moveTo(box.width + 2, box.y)
-        this.ctx.lineTo(box.width - 19, box.height)
+        this.ctx.moveTo(box.width + OFFSET[2], box.y)
+        this.ctx.lineTo(box.x + OFFSET[3], box.height)
         this.ctx.stroke()
     }
     async drawCornersState(window) {
