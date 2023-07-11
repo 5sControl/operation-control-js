@@ -65,7 +65,6 @@ class Operation {
         this.timeFromLastProcessedCorner = 0
         this.hkkLast = null
 
-        dispatcher.emit("operation finished")
         await this.report.add(this.buffer, "operation finished")
         this.report.send({
             cornersProcessed: this.cornersProcessed,
@@ -78,6 +77,8 @@ class Operation {
         this.cornersState = [false, false, false, false]
         this.startTracking = null
         this.stopTracking = null
+
+        dispatcher.emit("operation finished")
 
     }
     async isCornerProcessed(action_detection) { // ActionDetection

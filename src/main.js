@@ -1,4 +1,4 @@
-const {YMD} = require('./utils/Date')
+const {YMD, HMS} = require('./utils/Date')
 const {checkDirs} = require('./utils/Path')
 const dispatcher = require('./Dispatcher')
 
@@ -19,6 +19,13 @@ N_CPUS: ${process.env.N_CPUS}
 `)
 
 // let batch = []
+dispatcher.on("operation started", () => {
+    process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}/${HMS(new Date())}`
+    checkDirs(process.env.currentDebugFolder)
+})
+dispatcher.on("operation finished", () => {
+    process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}`
+})
 dispatcher.on("translation updated", async (_, buffer) => {
     const detections = await detector.detect(buffer)
     operation.check(buffer, detections)
