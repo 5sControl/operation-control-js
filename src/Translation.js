@@ -9,50 +9,46 @@ class Translation {
             length: 0
         }
     }
+    check(buffer) {
+        if (buffer === null) {
+            dispatcher.emit("snapshot null")
+            return null
+        }
+        if (buffer < 300000) {
+            dispatcher.emit("snapshot broken", `buffer length is ${buffer.length} \n`)
+            return null
+        }
+        if (buffer.length === this.buffer.current?.length) {
+            dispatcher.emit("snapshot same")
+            return null
+        }
+        return buffer
+    }
     saveLastLength() {
         this.buffer.previous.length = this.buffer.current?.length
-    }
-    isExist() {
-        return this.buffer.current !== null
-    }
-    isAnother() {
-        return this.buffer.current.length !== this.buffer.previous.length
-    }
-    isCorrect() {
-        return this.buffer.current.length > 300000
     }
 
     async update(bufferFromGer) {
         try {
+            let receivedBuffer
             if (bufferFromGer) {
-                this.buffer.current = bufferFromGer
-            } else {                
+                receivedBuffer = bufferFromGer
+            } else {
                 const response = await fetch(process.env.camera_url)
                 const arrayBuffer = await response.arrayBuffer()
-                this.buffer.current = Buffer.from(arrayBuffer)
+                receivedBuffer = Buffer.from(arrayBuffer)
             }
-
-            // snapshot.check()
-            if (!this.isExist()) {
-                dispatcher.emit("snapshot null"); 
-                return null
+            const checkedBuffer = this.check(receivedBuffer)
+            if (checkedBuffer) {
+                this.saveLastLength()
+                this.buffer.current = checkedBuffer
+                dispatcher.emit("snapshot updated", false, this.buffer.current)
             }
-            if (!this.isCorrect()) {
-                dispatcher.emit("snapshot broken", `buffer length is ${this.buffer.current.length} \n`); 
-                return null
-            }
-            if (!this.isAnother()) {
-                dispatcher.emit("snapshot same"); 
-                return null
-            }
-
-            this.saveLastLength()
-            // this.recordSnapshot(this.buffer.current)
-            dispatcher.emit("snapshot updated", false, this.buffer.current)
         } catch (error) {
             dispatcher.emit("snapshot update error", error)
         }
     }
+
     isRecording = false
     recordedSnapshots = 0
     recordSnapshot(buffer) {
