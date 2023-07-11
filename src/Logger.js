@@ -1,6 +1,3 @@
-const fs = require('fs')
-const {YMD} = require('./utils/Date')
-
 function Timestamp() {
 	const date = new Date()
 	const padTo2Digits = (num) => num.toString().padStart(2, '0')
@@ -21,14 +18,13 @@ function Timestamp() {
 	)
 }
 
-function EventRecord(eventName, payload) {
-    return `${Timestamp()}: ${eventName}${payload ? `\n${payload}` : "" }`
+function EventRecord(eventName, message) {
+    return `${Timestamp()}: ${eventName}${message ? `\n${message}` : "" }`
 }
 
-function logger(eventName, payload = "") {
-    const record = EventRecord(eventName, payload)
+function logger(eventName, message = "") {
+    const record = EventRecord(eventName, message)
     console.log(`\x1b[34m%s\x1b[0m`, record)
-    return eventName
 }
 
 module.exports = {logger}

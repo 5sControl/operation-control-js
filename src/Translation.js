@@ -17,7 +17,7 @@ class Translation {
             return null
         }
         if (buffer < 300000) {
-            dispatcher.emit("translation get broken buffer", `buffer length is ${buffer.length} \n`)
+            dispatcher.emit("translation get broken buffer", {message: `buffer length is ${buffer.length} \n`})
             return null
         }
         if (buffer.length === this.buffer.current?.length) {
@@ -40,10 +40,12 @@ class Translation {
             if (checkedBuffer) {
                 this.buffer.saveLastLength()
                 this.buffer.current = checkedBuffer
-                dispatcher.emit("translation updated", false, this.buffer.current)
+                dispatcher.emit("translation updated", { 
+                    notForConsole: true, buffer: this.buffer.current
+                })
             }
         } catch (error) {
-            dispatcher.emit("translation update error", error)
+            dispatcher.emit("translation update error", { message: error })
         }
     }
     constructor() {

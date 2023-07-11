@@ -45,9 +45,9 @@ class Report {
             body
         })
         .then(r => r.text())
-        .then(response => { dispatcher.emit("server response", response) })
-        .catch(err => { dispatcher.emit("error report send", err.code) })
-        dispatcher.emit("report sended", `corners: ${json.extra.cornersProcessed}\njson: ${body}\n\n`)
+        .then(response => { dispatcher.emit("server response", {message: response}) })
+        .catch(err => { dispatcher.emit("error report send", {message: err.code}) })
+        dispatcher.emit("report sended", {message: `corners: ${json.extra.cornersProcessed}\njson: ${body}\n\n`})
 
         this.photos = []
 

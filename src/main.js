@@ -10,15 +10,17 @@ const detector = require('./Detector')
 const operation = require('./Operation')
 const translation = require('./Translation')
 
-dispatcher.emit("container started", `camera_url: ${process.env.camera_url}
+dispatcher.emit("container started", { message: `
+camera_url: ${process.env.camera_url}
 folder: ${process.env.folder}
 server_url: ${process.env.server_url}
 currentDebugFolder: ${process.env.currentDebugFolder}
 N_CPUS: ${process.env.N_CPUS}
-`)
+`
+})
 
 // let batch = []
-dispatcher.on("translation updated", async (_, buffer) => {
+dispatcher.on("translation updated", async ({buffer}) => {
     const detections = await detector.detect(buffer)
     operation.check(buffer, detections)
     //     this.batch.push(checkBuffer)
