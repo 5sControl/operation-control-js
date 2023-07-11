@@ -6,10 +6,10 @@ process.env.N_CPUS = require('os').cpus().length
 process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}`
 checkDirs([process.env.folder, process.env.currentDebugFolder])
 
-const detector = require('./Detector')
-const control = require('./Control')
-const translation = require('./Translation')
+require('./Detector')
+require('./Control')
 require('./Report')
+const translation = require('./Translation')
 
 dispatcher.emit("container started", { message: `
 camera_url: ${process.env.camera_url}
@@ -18,11 +18,6 @@ server_url: ${process.env.server_url}
 currentDebugFolder: ${process.env.currentDebugFolder}
 N_CPUS: ${process.env.N_CPUS}
 `
-})
-
-dispatcher.on("translation updated", async ({buffer}) => {
-    const detections = await detector.detect(buffer)
-    control.check(buffer, detections)
 })
 
 module.exports = {translation}

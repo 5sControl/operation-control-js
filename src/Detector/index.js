@@ -1,6 +1,7 @@
 const ModelWorker = require('./workers/ModelWorker')
 const {withinWorkspace} = require('../utils/2D')
 const {createCanvas, Image} = require('@napi-rs/canvas')
+const dispatcher = require('../Dispatcher')
 
 class Detector {
 
@@ -46,7 +47,7 @@ class Detector {
             detect_nothing,
             action_detection // undefined || YoloDetection
         }
-        return this.detections
+        dispatcher.emit("detections ready", { detections: this.detections, buffer, notForConsole: true })
     }
     /**
      * @returns {Blob}
@@ -83,5 +84,4 @@ class Detector {
 }
 
 const detector = new Detector()
-
-module.exports = detector
+dispatcher.on("translation updated", async ({buffer}) => await detector.detect(buffer))

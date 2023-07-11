@@ -126,5 +126,4 @@ class Control {
 }
 
 const control = new Control()
-
-module.exports = control
+dispatcher.on("detections ready", async ({buffer, detections}) => control.check(buffer, detections))
