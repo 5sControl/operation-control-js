@@ -4,6 +4,12 @@ class Drawer {
     constructor(buffer) {
         this.buffer = buffer
     }
+    async draw(event, isDrawCornersState, bbox, cornersState, currentSide) {
+        let promises = [this.drawEvent(event)]
+        if (isDrawCornersState) promises.push(this.drawCornersState(bbox, cornersState, currentSide))
+        await Promise.all(promises)
+        return this.buffer
+    }
     createCtx() {
         this.canvas = createCanvas(1920, 1080)
         this.ctx = this.canvas.getContext('2d')

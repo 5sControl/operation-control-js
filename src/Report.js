@@ -8,17 +8,10 @@ class Report {
 
     photos = []
     async add(buffer, event, isDrawCornersState = false, bbox, cornersState, currentSide) {
-        const drawer = await this.draw(buffer, event, isDrawCornersState, bbox, cornersState, currentSide)
-        const imagePath = this.upload(drawer.buffer)
+        let drawedBuffer = await new Drawer(buffer).draw(event, isDrawCornersState, bbox, cornersState, currentSide)
+        const imagePath = this.upload(drawedBuffer)
         const photoRecord = {"image": imagePath, "date": djangoDate(new Date())}
         this.photos.push(photoRecord)
-    }
-    async draw(buffer, event, isDrawCornersState, bbox, cornersState, currentSide) {
-        let drawer = new Drawer(buffer)
-        let promises = [drawer.drawEvent(event)]
-        if (isDrawCornersState) promises.push(drawer.drawCornersState(bbox, cornersState, currentSide))
-        await Promise.all(promises)
-        return drawer
     }
     /**
      * @param {Buffer} buffer from Camera or Canvas
