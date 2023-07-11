@@ -62,5 +62,3 @@ class Report {
 
 }
 new Report()
-
-module.exports = Report
