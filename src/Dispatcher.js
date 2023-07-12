@@ -1,25 +1,17 @@
 const {EventEmitter} = require('events')
-const {logger} = require('./Logger')
-const {YMD, HMS} = require('./utils/Date')
-const {checkDirs} = require('./utils/Path')
+const {Timestamp} = require('./utils/Date')
 
 class Dispatcher extends EventEmitter {
-    emit(event, payload) {
-        super.emit(event)
-        if (payload !== false) logger(event, payload)
+    emit(eventName, options) {
+        super.emit(eventName, options)
+        if (!options?.notForConsole) {
+            const message = options?.message
+            const record = `${Timestamp()}: ${eventName}${message ? `\n${message}` : "" }`
+            console.log(`\x1b[34m%s\x1b[0m`, record)        
+        }
     }
 }
 
 const dispatcher = new Dispatcher()
-
-dispatcher.on("operation started", () => {
-    process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}/${HMS(new Date())}`
-    checkDirs(process.env.currentDebugFolder)
-})
-dispatcher.on("operation finished", () => {
-    setTimeout(() => {
-        process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}`
-    }, 1000)
-})
 
 module.exports = dispatcher

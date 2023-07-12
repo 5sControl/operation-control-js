@@ -1,3 +1,23 @@
+function Timestamp() {
+	const date = new Date()
+	const padTo2Digits = (num) => num.toString().padStart(2, '0')
+	return (
+		[
+            date.getFullYear(),
+            padTo2Digits(date.getMonth() + 1),
+            padTo2Digits(date.getDate()),
+		].join('-')
+            + ' ' +
+		[
+            padTo2Digits(date.getHours()),
+            padTo2Digits(date.getMinutes()),
+            padTo2Digits(date.getSeconds())
+		].join(':')
+		+ '.' +
+		date.getMilliseconds()
+	)
+}
+
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0')
 }
@@ -38,4 +58,4 @@ function djangoDate(date) {
     )
 }
 
-module.exports = { YMD, HMS, djangoDate }
+module.exports = { Timestamp, YMD, HMS, djangoDate }
