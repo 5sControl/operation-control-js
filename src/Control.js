@@ -8,7 +8,9 @@ class Control {
     stopTracking = null
 
     isBeginTimer = 0
+    isBeginTimerSuspense = 0
     isEndTimer = 0
+    isEndTimerSuspense = 0
     hkkCounter = 0
 
     window = {
@@ -44,15 +46,25 @@ class Control {
     check(buffer, { window_detection, detect_window_and_worker, detect_nothing, action_detection }) {
         this.buffer = buffer
         if (window_detection) this.window.bbox = window_detection.bbox
-        if (detect_window_and_worker && !this.startTracking) {
-            this.isBeginTimer++
-            dispatcher.emit(`Worker with window appeared: ${this.isBeginTimer}s`)
-            if (this.isBeginTimer > 5) this.begin()
+        if (!this.startTracking) {
+            if (detect_window_and_worker) {
+                this.isBeginTimer++
+                dispatcher.emit(`Worker with window appeared: ${this.isBeginTimer}s`)
+                if (this.isBeginTimer > 5) this.begin()                
+            } else {
+                this.isBeginTimerSuspense++
+                if (this.isBeginTimerSuspense > 10) this.isBeginTimer = 0
+            }
         }
-        if (detect_nothing && this.startTracking && !this.stopTracking) {
-            this.isEndTimer++
-            dispatcher.emit(`Worker with window disappeared: ${this.isEndTimer}s`)
-            if (this.isEndTimer > 5) this.end()
+        if (this.startTracking && !this.stopTracking) {
+            if (detect_nothing) {                
+                this.isEndTimer++
+                dispatcher.emit(`Worker with window disappeared: ${this.isEndTimer}s`)
+                if (this.isEndTimer > 5) this.end()
+            } else {
+                this.isEndTimerSuspense++
+                if (this.isEndTimerSuspense > 10) this.isEndTimer = 0
+            }
         }
         if (this.startTracking) this.isCornerProcessed(action_detection)
     }
@@ -60,6 +72,7 @@ class Control {
     async begin() {
         this.startTracking = djangoDate(new Date())
         this.isBeginTimer = 0
+        this.isBeginTimerSuspense = 0
         this.window.currentSide = "first"
         dispatcher.emit("operation started", {buffer: this.buffer})
     }
@@ -67,6 +80,7 @@ class Control {
 
         this.stopTracking = djangoDate(new Date())
         this.isEndTimer = 0
+        this.isEndTimerSuspense = 0
 
         this.window.processedSide = null
         this.window.timeFromLastProcessedCorner = 0
