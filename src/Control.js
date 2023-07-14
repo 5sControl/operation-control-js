@@ -137,11 +137,14 @@ class Control {
         dispatcher.emit("corner processed", {buffer: this.buffer, window: this.window})
     }
 
-    checkBatch(detectionsBatch, buffersBatch) {
-        buffersBatch.forEach((buffer, index) => this.check(buffer, detectionsBatch[index]))
+    checkBatch(batch) {
+        batch.forEach(snapshot => {
+            this.check(snapshot.buffer, snapshot.detections)
+            snapshot.saveToDb()
+        })
     }
 
 }
 
 const control = new Control()
-dispatcher.on("batch detections ready", async ({detectionsBatch, buffersBatch}) => control.checkBatch(detectionsBatch, buffersBatch))
+dispatcher.on("batch detections ready", async ({batch}) => control.checkBatch(batch))

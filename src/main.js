@@ -10,7 +10,7 @@ require('./Detector')
 require('./Control')
 require('./Report')
 require('./Batch')
-const translation = require('./Translation')
+require('./Translation')
 
 dispatcher.emit("container started", { message: `
 camera_url: ${process.env.camera_url}
@@ -18,7 +18,6 @@ folder: ${process.env.folder}
 server_url: ${process.env.server_url}
 currentDebugFolder: ${process.env.currentDebugFolder}
 N_CPUS: ${process.env.N_CPUS}
+socket_server: ${process.env.socket_server}
 `
 })
-
-module.exports = {translation}

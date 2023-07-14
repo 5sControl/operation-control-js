@@ -1,11 +1,11 @@
 {
   "name": "operation-control-js",
-  "version": "v1.0.0-rc.3",
-  "date": "21.06.2023",
+  "version": "v1.0.0-rc.5",
+  "date": "12.07.2023",
   "description": "Designed to ensure that the necessary number of operations are executed while cleaning seams during production. This type of control helps to streamline the process and prevent any errors or omissions that could lead to costly production delays.",
   "main": "src/main.js",
   "scripts": {
-    "test": "export camera_url=http://192.168.1.110:3456/onvif-http/snapshot?Profile_1 && export folder=images/192.168.1.110 && export server_url=http://192.168.1.110 && node src/main.js"
+    "test": "export camera_url=http://192.168.1.110:3456/onvif-http/snapshot?Profile_1 && export folder=images/192.168.1.110 && export server_url=http://192.168.1.110 && export socket_server=ws://localhost:3000 && node src/main.js"
   },
   "repository": {
     "type": "git",
@@ -19,8 +19,10 @@
   },
   "homepage": "https://github.com/5sControl/operation-control-js#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.26.0",
+    "socket.io-client": "^4.7.1",
+    "@napi-rs/canvas": "^0.1.39",
     "@tensorflow/tfjs-node": "^4.4.0",
-    "workerpool": "^6.4.0",
-    "@napi-rs/canvas": "^0.1.39"
+    "workerpool": "^6.4.0"
   }
 }

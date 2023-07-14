@@ -1,6 +1,21 @@
 const dispatcher = require('./Dispatcher')
+const { supabase } = require("./supabaseClient.js")
+const io = require('socket.io-client')
+const socketURL = process.env.socket_server || "http://172.16.101.100:3456"
+const socket = io(socketURL)
+const Snapshot = require('./Snapshot.js')
 
 class Translation {
+
+    index = 0
+    async setIndex() {
+        const { data, error } = await supabase
+        .storage
+        .from('snapshots')
+        .list()
+        this.index = data.length
+        if (error) dispatcher.emit("set index error", {message: error})
+    }
 
     buffer = {
         current: null,
@@ -26,34 +41,32 @@ class Translation {
         }
         return buffer
     }
-    async update(bufferFromGer) {
+    async update(receivedBuffer) {
         try {
-            let receivedBuffer
-            if (bufferFromGer) {
-                receivedBuffer = bufferFromGer
-            } else {
-                const response = await fetch(process.env.camera_url)
-                const arrayBuffer = await response.arrayBuffer()
-                receivedBuffer = Buffer.from(arrayBuffer)
-            }
             const checkedBuffer = this.check(receivedBuffer)
             if (checkedBuffer) {
                 this.buffer.saveLastLength()
                 this.buffer.current = checkedBuffer
-                dispatcher.emit("translation updated", { 
-                    notForConsole: true, buffer: this.buffer.current
-                })
+                const snapshot = new Snapshot(checkedBuffer, this.index)
+                dispatcher.emit("new snapshot received", { notForConsole: true, snapshot })
             }
         } catch (error) {
             dispatcher.emit("translation update error", { message: error })
         }
     }
     constructor() {
-        if (!process.env.isDebugger) setInterval(() => this.update(), 1000)
+        socket.on("connect", async () => {
+            console.log(`Connected to the socket server: ${socketURL}`)
+            await this.setIndex()
+            this.startListening()
+        })
+    }
+    startListening() {
+        socket.on("snapshot_updated", async (payload) => {
+            this.index++
+            if (this.index < 2400) this.update(payload.screenshot)
+        })
     }
 
 }
-
-const translation = new Translation()
-
-module.exports = translation
+new Translation()

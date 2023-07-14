@@ -69,17 +69,18 @@ class Detector {
         const croppedBlob = await newCan.encode('jpeg', 90)
         return croppedBlob
     }
-    async detectBatch(buffersBatch) {
+    async detectBatch(batch) {
         const prev = Date.now()
         let workers = []
-        buffersBatch.forEach(buffer => workers.push(this.detect(buffer)))
-        const detectionsBatch = await Promise.all(workers)
+        batch.forEach(snapshot => workers.push(this.detect(snapshot.buffer)))
+        const detectionsArray = await Promise.all(workers)
         const now = Date.now()
         console.log(`batch detection - ${now - prev}ms`)
-        dispatcher.emit("batch detections ready", { detectionsBatch, buffersBatch, notForConsole: true })
+        detectionsArray.forEach((detections, i) => batch[i].detections = detections)
+        dispatcher.emit("batch detections ready", { batch, notForConsole: true })
     }
     
 }
 
 const detector = new Detector()
-dispatcher.on("batch ready", async ({batch}) => {detector.detectBatch(batch)})
+dispatcher.on("batch ready", async ({batch}) => detector.detectBatch(batch))
