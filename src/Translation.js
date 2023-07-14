@@ -64,7 +64,8 @@ class Translation {
     startListening() {
         socket.on("snapshot_updated", async (payload) => {
             this.index++
-            if (this.index < 2400) this.update(payload.screenshot)
+            // if (this.index < 2400) this.update(payload.screenshot)
+            this.update(payload.screenshot)
         })
     }
 

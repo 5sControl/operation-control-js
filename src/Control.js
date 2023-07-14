@@ -140,7 +140,7 @@ class Control {
     checkBatch(batch) {
         batch.forEach(snapshot => {
             this.check(snapshot.buffer, snapshot.detections)
-            snapshot.saveToDb()
+            // snapshot.saveToDb()
         })
     }
 
