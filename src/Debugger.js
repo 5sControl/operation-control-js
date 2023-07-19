@@ -1,4 +1,5 @@
 const db = require("./DB")
+const Drawer = require("./Report/Drawer")
 
 dispatcher.on("container started", async () => {
     const record = {
@@ -9,10 +10,11 @@ dispatcher.on("container started", async () => {
     db.insert("launches", record)
 })
 
-dispatcher.on("snapshot checked", ({snapshot}) => {
+dispatcher.on("snapshot checked", async ({snapshot}) => {
     const {launch, index, received, detections} = snapshot
     const record = {launch, index, received, detections}
     db.insert("timeline", record)
-    // const snapshot.buffer = (640px and 40%)
+    const compressed_buffer = await new Drawer(snapshot.buffer).compress()
+    snapshot.buffer = compressed_buffer
     db.upload(snapshot)
 })

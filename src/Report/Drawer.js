@@ -6,7 +6,12 @@ class Drawer {
         this.eventName = eventName
     }
     async compress() {
-        
+        this.canvas = createCanvas(1920, 1080)
+        this.ctx = this.canvas.getContext('2d')
+        const image = new Image()
+        image.src = this.buffer
+        this.ctx.drawImage(image, 0, 0, image.width/3, image.height/3)
+        return this.buffer = await this.canvas.encode('jpeg', 20)
     }
     async draw(window) {
         let promises = [this.drawEvent(this.eventName)]
