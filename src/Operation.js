@@ -2,7 +2,7 @@ const dispatcher = require('./Dispatcher')
 const {djangoDate} = require('./utils/Date')
 const {isOperationOnWindow, whatSide} = require('./utils/2D')
 
-class Control {
+class OperationControl {
 
     startTracking = null
     stopTracking = null
@@ -146,5 +146,5 @@ class Control {
 
 }
 
-const control = new Control()
-dispatcher.on("batch detections ready", async ({batch}) => control.checkBatch(batch))
+const operation_control = new OperationControl()
+dispatcher.on("batch detections ready", async ({batch}) => operation_control.checkBatch(batch))

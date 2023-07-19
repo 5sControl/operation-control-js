@@ -7,7 +7,7 @@ process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}`
 checkDirs([process.env.folder, process.env.currentDebugFolder])
 
 require('./Detector')
-require('./Control')
+require('./Machine')
 require('./Report')
 require('./Batch')
 require('./Translation')
