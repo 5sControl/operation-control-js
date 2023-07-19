@@ -3,7 +3,8 @@ const db = require("./DB")
 dispatcher.on("container started", async () => {
     const record = {
         id: process.env.launch,
-        envs: { WORKSPACE_ZONE: global.WORKSPACE_ZONE }
+        envs: { WORKSPACE_ZONE: global.WORKSPACE_ZONE },
+        is_test
     }
     db.insert("launches", record)
 })
