@@ -1,13 +1,19 @@
 const {createCanvas, Image} = require('@napi-rs/canvas')
 
 class Drawer {
-    constructor(buffer, eventName) {
+    constructor(buffer, eventName = "") {
         this.buffer = buffer
         this.eventName = eventName
     }
     async draw(window) {
         let promises = [this.drawEvent(this.eventName)]
         if (window) promises.push(this.drawCornersState(window))
+        await Promise.all(promises)
+        return this.buffer
+    }
+    async draw_detections(detections) {
+        let promises = [this.draw_box(global.WORKSPACE_ZONE, "green")]
+        if (detections?.worker_detection) promises.push(this.draw_box(detections.worker_detection.bbox, "blue"))
         await Promise.all(promises)
         return this.buffer
     }
@@ -18,7 +24,16 @@ class Drawer {
         image.src = this.buffer
         this.ctx.drawImage(image, 0, 0)
     }
-
+    async draw_box(rect, color) {
+        if (!this.ctx) this.createCtx()
+        const [x, y, width, height] = rect
+        this.ctx.lineWidth = 10
+        this.ctx.strokeStyle = color
+        this.ctx.beginPath()
+        this.ctx.rect(x, y, width, height)
+        this.ctx.stroke()
+        this.buffer = await this.canvas.encode('jpeg', 50)
+    }
     async drawEvent(text) {
         if (!this.ctx) this.createCtx()
         this.ctx.font = "bold 36px sans"

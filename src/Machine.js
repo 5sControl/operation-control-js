@@ -28,7 +28,6 @@ const machine_control = {
                         third_snapshot_for_report,
                         checked_snapshot
                     ]
-                    console.log(snapshots_for_report)
                     dispatcher.emit("machine: report", {snapshots_for_report})
                     this.first_snapshot_for_report = null
                 }

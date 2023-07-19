@@ -5,10 +5,14 @@ const {djangoDate} = require('../utils/Date')
 
 const report = {
     photos: [],
-    async add(buffer, eventName, window) {
-        let drawedBuffer = await new Drawer(buffer, eventName).draw(window)
+    // async add(buffer, eventName, window) {
+    async add(snapshot) {
+        // let drawedBuffer = await new Drawer(buffer, eventName).draw(window)
+        let drawedBuffer = await new Drawer(snapshot.buffer).draw_detections(snapshot.detections)
         const imagePath = this.upload(drawedBuffer)
-        const photoRecord = {"image": imagePath, "date": djangoDate(new Date())}
+        console.log(snapshot)
+        const photoRecord = {"image": imagePath, "date": djangoDate(new Date(snapshot.received))}
+        // const photoRecord = {"image": imagePath, "date": djangoDate(new Date())}
         this.photos.push(photoRecord)
     },
     /**
@@ -31,7 +35,8 @@ const report = {
             "start_tracking": this.photos[0].date,
             "stop_tracking": this.photos[this.photos.length - 1].date,
             "photos": this.photos,
-            "violation_found": extra.cornersProcessed !== 4,
+            // "violation_found": extra.cornersProcessed !== 4,
+            "violation_found": true,
             "extra": extra
         }
         const body = JSON.stringify(json, null, 2)
@@ -53,6 +58,11 @@ dispatcher.on("operation finished", async ({buffer, extra}) => {
     await report.add(buffer, "operation finished")
     report.send(extra)
 })
-dispatcher.on("corner processed", async ({buffer, window}) => {
-    report.add(buffer, `${window.cornersProcessed} corner processed`, window)
+dispatcher.on("corner processed", async ({buffer, window}) => report.add(buffer, `${window.cornersProcessed} corner processed`, window))
+dispatcher.on("machine: report", async ({snapshots_for_report}) => {
+    console.log("64", snapshots_for_report)
+    for (const snapshot of snapshots_for_report) {
+        await report.add(snapshot)
+    }
+    report.send({"operationType": "unknown"})
 })

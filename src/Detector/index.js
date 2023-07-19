@@ -5,7 +5,6 @@ const {bboxAtWorkspace} = require('../utils/2D')
 class Detector {
 
     model
-    // WORKSPACE_RECT = [1600, 900]
     
     constructor() {
         if (!this.model) {
