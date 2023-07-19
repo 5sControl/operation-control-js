@@ -36,6 +36,7 @@ const machine_control = {
             }
         }
         if (!this.first_snapshot_for_report) this.previous_snapshot = checked_snapshot
+        dispatcher.emit("snapshot checked", {snapshot: checked_snapshot})
     },
     checkBatch(batch) {
         batch.forEach(snapshot => this.check(snapshot))

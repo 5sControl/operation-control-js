@@ -8,14 +8,6 @@ const {is_working_time} = require('./utils/Date')
 class Translation {
 
     index = 0
-    async setIndex() {
-        const { data, error } = await supabase
-        .storage
-        .from('snapshots')
-        .list()
-        this.index = data.length
-        if (error) dispatcher.emit("set index error", {message: error})
-    }
 
     buffer = {
         current: null,
@@ -58,13 +50,12 @@ class Translation {
     constructor() {
         socket.on("connect", async () => {
             console.log(`Connected to the socket server: ${socketURL}`)
-            await this.setIndex()
             this.startListening()
         })
     }
     startListening() {
         socket.on("snapshot_updated", async (payload) => {
-            if (is_working_time()) this.update(payload.screenshot)
+            if (is_working_time() || is_test) this.update(payload.screenshot)
         })
     }
 

@@ -6,7 +6,6 @@ class Snapshot {
         this.received = new Date()
         this.index = index.toString()
         this.detections = []
-        this.events = []
     }
     async upload() {
         const { data, error } = await supabase.storage
@@ -18,7 +17,7 @@ class Snapshot {
         }
     }
     async insert() {
-        const {received, index, detections, events} = this
+        const {received, index, detections} = this
         const { data, error } = await supabase
         .from("timeline")
         .insert([{received, index, detections, events}])
