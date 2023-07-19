@@ -46,6 +46,7 @@ class Translation {
             if (checkedBuffer) {
                 this.buffer.saveLastLength()
                 this.buffer.current = checkedBuffer
+                this.index++
                 const snapshot = new Snapshot(checkedBuffer, this.index)
                 dispatcher.emit("new snapshot received", { notForConsole: true, snapshot })
             }
@@ -61,11 +62,7 @@ class Translation {
         })
     }
     startListening() {
-        socket.on("snapshot_updated", async (payload) => {
-            this.index++
-            // if (this.index < 2400) this.update(payload.screenshot)
-            this.update(payload.screenshot)
-        })
+        socket.on("snapshot_updated", async (payload) => this.update(payload.screenshot))
     }
 
 }
