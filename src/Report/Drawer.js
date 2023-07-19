@@ -6,7 +6,7 @@ class Drawer {
         this.eventName = eventName
     }
     async compress() {
-        this.canvas = createCanvas(1920, 1080)
+        this.canvas = createCanvas(640, 360)
         this.ctx = this.canvas.getContext('2d')
         const image = new Image()
         image.src = this.buffer

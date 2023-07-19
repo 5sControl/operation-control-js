@@ -18,3 +18,17 @@ dispatcher.on("snapshot checked", async ({snapshot}) => {
     snapshot.buffer = compressed_buffer
     db.upload(snapshot)
 })
+
+dispatcher.on("machine: report", async ({snapshots_for_report}) => {
+    let cleaned_snapshots = []
+    for (const snapshot of snapshots_for_report) {
+        const {received, index} = snapshot
+        cleaned_snapshots.push({received, index})
+    }
+    const record = {
+        control_name: "machine",
+        launch: snapshots_for_report[0].launch,
+        snapshots: cleaned_snapshots
+    }
+    db.insert("reports", record)
+})
