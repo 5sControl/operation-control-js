@@ -5,6 +5,9 @@ class Drawer {
         this.buffer = buffer
         this.eventName = eventName
     }
+    async compress() {
+        
+    }
     async draw(window) {
         let promises = [this.drawEvent(this.eventName)]
         if (window) promises.push(this.drawCornersState(window))

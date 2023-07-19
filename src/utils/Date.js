@@ -71,7 +71,7 @@ function is_working_time() {
     
     const date = new Date()
     const hour = date.getHours()
-    const min = date.getMinutes()
+    const min = (date.getMinutes() < 10 ? '0' : '' ) + date.getMinutes()
     const current_time = convert_time_to_minutes(`${hour}:${min}`)
 
     return current_time > start_work_day && current_time < finish_work_day

@@ -9,5 +9,9 @@ dispatcher.on("container started", async () => {
 })
 
 dispatcher.on("snapshot checked", ({snapshot}) => {
-    console.log(snapshot.index)
+    const {launch, index, received, detections} = snapshot
+    const record = {launch, index, received, detections}
+    db.insert("timeline", record)
+    // const snapshot.buffer = (640px and 40%)
+    db.upload(snapshot)
 })
