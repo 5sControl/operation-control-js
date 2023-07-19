@@ -3,8 +3,9 @@ const {djangoDate} = require('./utils/Date')
 
 class MachineControl {
 
-    check(buffer, { window_detection, detect_window_and_worker, detect_nothing, action_detection }) {
-        this.buffer = buffer
+    check(buffer, { worker_detection }) {
+        // this.buffer = buffer
+        console.log(worker_detection)
     }
 
     async begin() {
@@ -16,10 +17,10 @@ class MachineControl {
     }
 
     checkBatch(batch) {
-        // batch.forEach(snapshot => {
-        //     this.check(snapshot.buffer, snapshot.detections)
-        //     // snapshot.saveToDb()
-        // })
+        batch.forEach(snapshot => {
+            this.check(snapshot.buffer, snapshot.detections)
+            // snapshot.saveToDb()
+        })
     }
 
 }

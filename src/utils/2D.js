@@ -43,6 +43,12 @@ function withinWorkspace(bbox, rect) { // rect in another rect
     const [x, y, width, height] = bbox
     return x < rect[0] && y < rect[1] ? true : false
 }
+function bboxAtWorkspace(bbox, WORKSPACE_ZONE) {
+	const x_bbox = bbox[0]
+	const y_bbox = bbox[1]
+	const [x, y, width, height] = WORKSPACE_ZONE
+	return x_bbox > x && x_bbox < x + width && y_bbox > y && y_bbox < y + height
+}
 
 /**
  * @returns {"left" | "right"}
@@ -63,4 +69,4 @@ function whatSide(rect, window_bbox) {
     }
 }
 
-module.exports = { bBox, isOperationOnWindow, withinWorkspace, whatSide }
+module.exports = { bBox, isOperationOnWindow, withinWorkspace, whatSide, bboxAtWorkspace }
