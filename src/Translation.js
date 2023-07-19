@@ -1,4 +1,3 @@
-const dispatcher = require('./Dispatcher')
 const { supabase } = require("./supabaseClient.js")
 const io = require('socket.io-client')
 const socketURL = process.env.socket_server || "http://172.16.101.100:3456"

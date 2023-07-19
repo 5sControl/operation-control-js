@@ -1,4 +1,3 @@
-const dispatcher = require('./Dispatcher')
 const {djangoDate} = require('./utils/Date')
 
 class MachineControl {

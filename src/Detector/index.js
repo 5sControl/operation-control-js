@@ -1,8 +1,7 @@
 const ModelWorker = require('./workers/ModelWorker')
 const {bboxAtWorkspace} = require('../utils/2D')
 // const {createCanvas, Image} = require('@napi-rs/canvas')
-const dispatcher = require('../Dispatcher')
-console.log(WORKSPACE_ZONE)
+
 class Detector {
 
     model

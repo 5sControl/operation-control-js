@@ -1,6 +1,5 @@
 const fs = require('fs')
 const crypto = require('crypto')
-const dispatcher = require('../Dispatcher')
 const Drawer = require('./Drawer')
 const {djangoDate} = require('../utils/Date')
 

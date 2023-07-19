@@ -1,5 +1,3 @@
-const dispatcher = require('./Dispatcher')
-
 let batch = []
 
 dispatcher.on("new snapshot received", ({snapshot}) => {
