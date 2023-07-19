@@ -3,6 +3,7 @@ const io = require('socket.io-client')
 const socketURL = process.env.socket_server || "http://172.16.101.100:3456"
 const socket = io(socketURL)
 const Snapshot = require('./Snapshot.js')
+const {is_working_time} = require('./utils/Date')
 
 class Translation {
 
@@ -62,7 +63,9 @@ class Translation {
         })
     }
     startListening() {
-        socket.on("snapshot_updated", async (payload) => this.update(payload.screenshot))
+        socket.on("snapshot_updated", async (payload) => {
+            if (is_working_time()) this.update(payload.screenshot)
+        })
     }
 
 }
