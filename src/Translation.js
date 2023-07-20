@@ -54,7 +54,8 @@ class Translation {
     }
     startListening() {
         socket.on("snapshot_updated", async (payload) => {
-            if (is_working_time() || is_test) this.update(payload.screenshot)
+            // if (is_working_time() || is_test) this.update(payload.screenshot)
+            this.update(payload.screenshot)
         })
     }
 
