@@ -10,7 +10,7 @@ const db = {
     },
     async upload(snapshot) {
         const { data, error } = await supabase.storage
-        .from("snapshots").upload(`${snapshot.launch}/${snapshot.index}.jpeg`, snapshot.buffer, {upsert: true})
+        .from("snapshots").upload(`${snapshot.launch}/${snapshot.index}.jpeg`, snapshot.compressed_buffer, {upsert: true})
         if (error) {
             console.log(error)
         } else {

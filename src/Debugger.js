@@ -14,8 +14,7 @@ dispatcher.on("snapshot checked", async ({snapshot}) => {
     const {launch, index, received, detections} = snapshot
     const record = {launch, index, received, detections}
     db.insert("timeline", record)
-    const compressed_buffer = await new Drawer(snapshot.buffer).compress()
-    snapshot.buffer = compressed_buffer
+    snapshot.compressed_buffer = await new Drawer(snapshot.buffer).compress()
     db.upload(snapshot)
 })
 
