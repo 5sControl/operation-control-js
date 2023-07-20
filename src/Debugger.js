@@ -20,6 +20,9 @@ dispatcher.on("snapshot checked", async ({snapshot}) => {
 })
 
 dispatcher.on("machine: report", async ({snapshots_for_report}) => {
+    if (!snapshots_for_report[0]) {
+        snapshots_for_report[0] = snapshots_for_report[1]
+    }
     let cleaned_snapshots = []
     for (const snapshot of snapshots_for_report) {
         const {received, index} = snapshot
