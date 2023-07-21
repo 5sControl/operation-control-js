@@ -61,7 +61,7 @@ class Drawer {
             this.ctx.fill()
             this.drawSymbol(x, y, cornerState ? "mark" : "cross")
         }
-        this.buffer = await this.canvas.encode('jpeg', 100)
+        this.buffer = await this.canvas.encode('jpeg', 50)
     }
     setBox(x, y) {
         return {
