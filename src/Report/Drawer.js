@@ -102,6 +102,7 @@ class Drawer {
         let points = []
         points = currentSide === "first" ? [p1,p2,p3,p4] : [p3,p4,p1,p2]
         let promises = []
+        //TODO: draw only processed corners
         points.forEach(async (point, i) => promises.push(this.drawPoint(point, cornersState[i])))
         await Promise.all(promises)
         this.buffer = await this.canvas.encode('jpeg', 50)
