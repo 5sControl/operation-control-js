@@ -1,5 +1,5 @@
 const db = require("./DB")
-const Drawer = require("./Report/Drawer")
+const Drawer = require("../Report/Drawer")
 
 dispatcher.on("container started", async () => {
     const record = {
