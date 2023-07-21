@@ -113,17 +113,17 @@ class OperationControl {
                 const currentSide = whatSide(this.action_detection.bbox, this.window.bbox)
                 if (this.window.processedSide === null) {
                     dispatcher.emit("No side has been counted yet")
-                    await this.addCleanedCorner(currentSide)
+                    this.addCleanedCorner(currentSide)
                 } else {
                     dispatcher.emit("Some angle was counted")
                     if (currentSide === this.window.processedSide) {
                         dispatcher.emit(`It was the same corner (${this.window.processedSide})`)
                         if (this.window.timeFromLastProcessedCorner > 30) {
-                            await this.addCleanedCorner(currentSide)
+                            this.addCleanedCorner(currentSide)
                             dispatcher.emit(`Same angle but more than 30 seconds`)
                         }
                     } else {
-                        await this.addCleanedCorner(currentSide)
+                        this.addCleanedCorner(currentSide)
                         dispatcher.emit(`It was a different angle (${this.window.processedSide})`)
                     }
                 }
@@ -131,7 +131,7 @@ class OperationControl {
             this.hkkCounter = 0
         }
     }
-    async addCleanedCorner(processedSide) {
+    addCleanedCorner(processedSide) {
         this.window.processCorner(processedSide)
         dispatcher.emit("corner processed", {buffer: this.buffer, window: this.window})
     }
