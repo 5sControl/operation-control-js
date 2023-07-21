@@ -2,7 +2,6 @@ const io = require('socket.io-client')
 const socketURL = process.env.socket_server || "http://172.16.101.100:3456"
 const socket = io(socketURL)
 const Snapshot = require('./Snapshot.js')
-const {is_working_time} = require('./utils/Date')
 
 class Translation {
 
@@ -22,7 +21,7 @@ class Translation {
             dispatcher.emit("translation get null buffer")
             return null
         }
-        if (buffer < 300000) {
+        if (buffer.length < 300000) {
             dispatcher.emit("translation get broken buffer", {message: `buffer length is ${buffer.length} \n`})
             return null
         }
@@ -49,13 +48,7 @@ class Translation {
     constructor() {
         socket.on("connect", async () => {
             console.log(`Connected to the socket server: ${socketURL}`)
-            this.startListening()
-        })
-    }
-    startListening() {
-        socket.on("snapshot_updated", async (payload) => {
-            // if (is_working_time() || is_test) this.update(payload.screenshot)
-            this.update(payload.screenshot)
+            socket.on("snapshot_updated", async ({screenshot}) => this.update(screenshot))
         })
     }
 
