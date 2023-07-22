@@ -1,6 +1,6 @@
 const {YMD, HMS} = require('./utils/Date')
 const {checkDirs} = require('./utils/Path')
-global.dispatcher = require('./Dispatcher')
+global.dispatcher = require('./utils/Dispatcher')
 
 process.env.N_CPUS = require('os').cpus().length
 process.env.currentDebugFolder = `debug/operation-control/${YMD(new Date())}`

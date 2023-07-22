@@ -1,10 +1,8 @@
 require('./globals')
-// require('./Debugger')
-require('./Detector')
-require('./Machine')
-require('./Report')
-require('./Batch')
 require('./Translation')
+require('./Detector')
+require('./Control')
+require('./Report')
 
 dispatcher.emit("container started", { message: `
 launch: ${process.env.launch}

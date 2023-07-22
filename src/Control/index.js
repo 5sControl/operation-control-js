@@ -1,5 +1,5 @@
-const {djangoDate} = require('./utils/Date')
-const {isOperationOnWindow, whatSide} = require('./utils/2D')
+const {djangoDate} = require('../utils/Date')
+const {isOperationOnWindow, whatSide} = require('../utils/2D')
 
 class OperationControl {
 

@@ -1,5 +1,5 @@
 const {EventEmitter} = require('events')
-const {Timestamp} = require('./utils/Date')
+const {Timestamp} = require('./Date')
 
 class Dispatcher extends EventEmitter {
     emit(eventName, options) {

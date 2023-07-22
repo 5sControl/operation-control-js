@@ -3,4 +3,4 @@ WORKDIR /var/www/5scontrol
 COPY package.json .
 RUN npm i
 COPY . .
-ENTRYPOINT ["node", "src/main.js"]
+ENTRYPOINT ["node", "src/_.js"]
