@@ -5,14 +5,13 @@ const {djangoDate} = require('../utils/Date')
 
 const report = {
     photos: [],
-    // async add(buffer, eventName, window) {
-    async add(snapshot) {
-        // let drawedBuffer = await new Drawer(buffer, eventName).draw(window)
-        let drawedBuffer = await new Drawer(snapshot.buffer).draw_detections(snapshot.detections)
+    async add(buffer, eventName, window) {
+    // async add(snapshot) {
+        let drawedBuffer = await new Drawer(buffer, eventName).draw(window)
+        // let drawedBuffer = await new Drawer(snapshot.buffer).draw_detections(snapshot.detections)
         const imagePath = this.upload(drawedBuffer)
-        console.log(snapshot)
-        const photoRecord = {"image": imagePath, "date": djangoDate(new Date(snapshot.received))}
-        // const photoRecord = {"image": imagePath, "date": djangoDate(new Date())}
+        // const photoRecord = {"image": imagePath, "date": djangoDate(new Date(snapshot.received))}
+        const photoRecord = {"image": imagePath, "date": djangoDate(new Date())}
         this.photos.push(photoRecord)
     },
     /**
