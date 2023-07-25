@@ -34,8 +34,7 @@ const report = {
             "start_tracking": this.photos[0].date,
             "stop_tracking": this.photos[this.photos.length - 1].date,
             "photos": this.photos,
-            // "violation_found": extra.cornersProcessed !== 4,
-            "violation_found": true,
+            "violation_found": extra.cornersProcessed !== 4,
             "extra": extra
         }
         const body = JSON.stringify(json, null, 2)
