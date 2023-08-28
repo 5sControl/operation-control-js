@@ -7,10 +7,14 @@ class ModelWorker {
     }
     async exec(buffer) {
         try {
-            return await this.pool.exec('detect', [buffer])
+            const detections = await this.pool.exec('detect', [buffer])
+            return detections
         } catch (error) {
             console.error(error)
         }
+    }
+    terminate() {
+        this.pool.terminate()
     }
 }
 

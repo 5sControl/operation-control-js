@@ -18,6 +18,7 @@ class Detector {
     }
     async detect(buffer) {
         const ww_detections = await this.model.w.exec(buffer) // YoloDetection[]
+        this.model.w.terminate()
         const window_detection = ww_detections.find(d => d.class === 'window' && d.score > 0.5 && bboxAtWorkspace(d.bbox, WORKSPACE_ZONE))
         const worker_detection = ww_detections.find(d => d.class === 'worker' && d.score > 0.5 && bboxAtWorkspace(d.bbox, WORKSPACE_ZONE))
         const detect_window_and_worker = worker_detection && window_detection ? true : false
@@ -26,6 +27,7 @@ class Detector {
         if (worker_detection) {
             const workerBlob = await this.cutRegionFromBlob(buffer, worker_detection.bbox)
             let wo_detections = await this.model.o.exec(workerBlob)
+            this.model.o.terminate()
             if (wo_detections[0]?.score > 0.9) {
                 wo_detections = wo_detections.map(d => {
                     d.x = d.x + worker_detection.x
