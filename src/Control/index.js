@@ -143,4 +143,5 @@ class OperationControl {
 }
 
 const operation_control = new OperationControl()
-dispatcher.on("batch detections ready", async ({batch}) => operation_control.checkBatch(batch))
+// dispatcher.on("batch detections ready", async ({batch}) => operation_control.checkBatch(batch))
+dispatcher.on("snapshot detections ready", async ({snapshot}) => operation_control.check(snapshot.buffer, snapshot.detections))

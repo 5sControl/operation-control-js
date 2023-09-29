@@ -1,6 +1,6 @@
 {
   "name": "operation-control-js",
-  "version": "v1.0.0-rc.6",
+  "version": "v1.0.0-rc.8",
   "date": "12.07.2023",
   "description": "Designed to ensure that the necessary number of operations are executed while cleaning seams during production. This type of control helps to streamline the process and prevent any errors or omissions that could lead to costly production delays.",
   "main": "src/main.js",

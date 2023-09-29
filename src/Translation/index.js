@@ -54,4 +54,4 @@ class Translation {
 
 }
 new Translation()
-require('./Batch')
+// require('./Batch')

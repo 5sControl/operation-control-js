@@ -1,24 +1,23 @@
-const ModelWorker = require('./workers/ModelWorker')
 const {bboxAtWorkspace} = require('../utils/2D')
 const {createCanvas, Image} = require('@napi-rs/canvas')
+const loadYoloV8 = require('./models/yolov8')
 
 class Detector {
 
     model
     
-    constructor() {
+    async init() {
         if (!this.model) {
             console.time(`detector models load`)
             this.model = {
-                w: new ModelWorker("ww"),
-                o: new ModelWorker("wo")
+                w: await loadYoloV8(`./corner-cleaning/ww/model.json`),
+                o: await loadYoloV8(`./corner-cleaning/wo/model.json`, true)
             }
             console.timeEnd(`detector models load`)
         }
     }
     async detect(buffer) {
-        const ww_detections = await this.model.w.exec(buffer) // YoloDetection[]
-        this.model.w.terminate()
+        const ww_detections = await this.model.w.detect(buffer) // YoloDetection[]
         const window_detection = ww_detections.find(d => d.class === 'window' && d.score > 0.5 && bboxAtWorkspace(d.bbox, WORKSPACE_ZONE))
         const worker_detection = ww_detections.find(d => d.class === 'worker' && d.score > 0.5 && bboxAtWorkspace(d.bbox, WORKSPACE_ZONE))
         const detect_window_and_worker = worker_detection && window_detection ? true : false
@@ -26,8 +25,7 @@ class Detector {
         let action_detection
         if (worker_detection) {
             const workerBlob = await this.cutRegionFromBlob(buffer, worker_detection.bbox)
-            let wo_detections = await this.model.o.exec(workerBlob)
-            this.model.o.terminate()
+            let wo_detections = await this.model.o.detect(workerBlob)
             if (wo_detections[0]?.score > 0.9) {
                 wo_detections = wo_detections.map(d => {
                     d.x = d.x + worker_detection.x
@@ -83,4 +81,11 @@ class Detector {
 }
 
 const detector = new Detector()
-dispatcher.on("batch ready", async ({batch}) => detector.detectBatch(batch))
+dispatcher.on("container started", async () => await detector.init())
+// dispatcher.on("batch ready", async ({batch}) => detector.detectBatch(batch))
+dispatcher.on("new snapshot received", async ({snapshot}) => {
+    if (!detector.model.w) return
+    const detections = await detector.detect(snapshot.buffer)
+    snapshot.detections = detections
+    dispatcher.emit("snapshot detections ready", { snapshot, notForConsole: true })
+})
