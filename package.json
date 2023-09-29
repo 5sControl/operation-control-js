@@ -5,7 +5,8 @@
   "description": "Designed to ensure that the necessary number of operations are executed while cleaning seams during production. This type of control helps to streamline the process and prevent any errors or omissions that could lead to costly production delays.",
   "main": "src/main.js",
   "scripts": {
-    "test": "export camera_url=http://192.168.1.110:3456/onvif-http/snapshot?Profile_1 && export folder=images/192.168.1.110 && export server_url=http://192.168.1.110 && export socket_server=ws://localhost:3000 && export is_test=true && node src/_.js"
+    "test": "export camera_url=http://192.168.1.110:3456/onvif-http/snapshot?Profile_1 && export folder=images/192.168.1.110 && export server_url=http://192.168.1.110 && export socket_server=ws://localhost:3000 && export is_test=true && node src/_.js",
+    "publish": "sudo docker build -t 5scontrol/operation_control_js:v1.0.0-rc.8 . --platform=linux/amd64 && sudo docker push 5scontrol/operation_control_js:v1.0.0-rc.8"
   },
   "repository": {
     "type": "git",
