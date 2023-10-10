@@ -15,32 +15,6 @@ Empowers you to monitor and control the execution of technologically necessary n
 
 **Plug-in Operation control to 5controlS platform to start monitoring window seam trimming operations!**
 
-# **Project repositories**
-
-The connections between the project repositories are illustrated by the following diagram. 
-
-> Please note that to ensure system stability and perfomance you can use one of the Official 5S algorithms instead of Your Algorithm.
-
-<p align="center">
-  <img src="https://github.com/5sControl/5s-backend/assets/131950264/60cbc463-ce88-4af2-a4ed-7e3c01f7a955" alt="5controlS-diagram" />
-</p>
-
-**5controlS Platform:**
-1. [5s-backend](https://github.com/5sControl/5s-backend)
-2. [5s-frontend](https://github.com/5sControl/5s-frontend)
-3. [5s-algorithms-controller](https://github.com/5sControl/5s-algorithms-controller)
-4. [5s-onvif](https://github.com/5sControl/5s-onvif)
-5. [5s-onvif-finder]()
-
-**Official Algorithms:**
-1. [min-max](https://github.com/5sControl/min-max)
-2. [idle-control](https://github.com/5sControl/idle-control)
-3. [operation-control-js](https://github.com/5sControl/operation-control-js)
-4. [machine-control](https://github.com/5sControl/machine-control)
-5. [machine-control-js](https://github.com/5sControl/machine-control-js)
-
-**Algorithms Servers:**
-1. [inference-server-js]()
 
 # **Documentation**
 
@@ -61,9 +35,29 @@ If you want to contribute, read  our [contributing guide](CONTRIBUTING.md) to le
 
 We also have a list of [good first issues]() that will help you make your first step to beсoming a 5S contributor.
 
+# **Project repositories**
+
+**5controlS Platform:**
+1. [5s-backend](https://github.com/5sControl/5s-backend)
+2. [5s-frontend](https://github.com/5sControl/5s-frontend)
+3. [5s-algorithms-controller](https://github.com/5sControl/5s-algorithms-controller)
+4. [5s-onvif](https://github.com/5sControl/5s-onvif)
+5. [5s-onvif-finder]()
+
+**Official Algorithms:**
+1. [min-max](https://github.com/5sControl/min-max)
+2. [idle-control](https://github.com/5sControl/idle-control)
+3. [operation-control-js](https://github.com/5sControl/operation-control-js)
+4. [machine-control](https://github.com/5sControl/machine-control)
+5. [machine-control-js](https://github.com/5sControl/machine-control-js)
+
+**Algorithms Servers:**
+1. [inference-server-js]()
+
+
 # **License**
 
-> Please note that [some](Components-with-copyleft-licensies.md) of the Official Algorithms are using copyleft licensies.
+[AGPL-3.0](LICENSE)
 
 
 <br>
