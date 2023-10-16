@@ -57,7 +57,7 @@ We also have a list of [good first issues](https://github.com/5sControl/operatio
 
 [AGPL-3.0](LICENSE)
 
-> Machine control uses third party libraries that are distributed under their own terms (see [LICENSE-3RD-PARTY.md](https://github.com/5sControl/operation-control-js/blob/main/LICENSE-3RD-PARTY.md)).<br>
+> Operation control JS uses third party libraries that are distributed under their own terms (see [LICENSE-3RD-PARTY.md](https://github.com/5sControl/operation-control-js/blob/main/LICENSE-3RD-PARTY.md)).<br>
 
 <br>
 <div align="center">
