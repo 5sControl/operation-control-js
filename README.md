@@ -1,5 +1,3 @@
-# Operation Control JS
-
 # About Operation Control JS
 Operation Control is one of the Official [5controlS](https://5controls.com/) algorithm.
 
@@ -33,7 +31,7 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 
 If you want to contribute, read  our [contributing guide](CONTRIBUTING.md) to learn about our development process and pull requests workflow.
 
-We also have a list of [good first issues]() that will help you make your first step to beсoming a 5S contributor.
+We also have a list of [good first issues](https://github.com/5sControl/operation-control-js/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) that will help you make your first step to beсoming a 5S contributor.
 
 # **Project repositories**
 
@@ -42,7 +40,7 @@ We also have a list of [good first issues]() that will help you make your first 
 2. [5s-frontend](https://github.com/5sControl/5s-frontend)
 3. [5s-algorithms-controller](https://github.com/5sControl/5s-algorithms-controller)
 4. [5s-onvif](https://github.com/5sControl/5s-onvif)
-5. [5s-onvif-finder]()
+5. [5s-onvif-finder](https://github.com/5sControl/5s-onvif-finder)
 
 **Official Algorithms:**
 1. [min-max](https://github.com/5sControl/min-max)
@@ -52,13 +50,14 @@ We also have a list of [good first issues]() that will help you make your first 
 5. [machine-control-js](https://github.com/5sControl/machine-control-js)
 
 **Algorithms Servers:**
-1. [inference-server-js]()
+1. [inference-server-js](https://github.com/5sControl/inference-server-js)
 
 
 # **License**
 
 [AGPL-3.0](LICENSE)
 
+> Machine control uses third party libraries that are distributed under their own terms (see [LICENSE-3RD-PARTY.md](https://github.com/5sControl/operation-control-js/blob/main/LICENSE-3RD-PARTY.md)).<br>
 
 <br>
 <div align="center">
@@ -72,38 +71,3 @@ We also have a list of [good first issues]() that will help you make your first 
     <img src="https://github.com/5sControl/Manufacturing-Automatization-Enterprise/blob/ebf176c81fdb62d81b2555cb6228adc074f60be0/assets/youtube%20(1).png" width="5%" alt="" /></a>
 </div>
 
-
-
-## Changelog:
-`🪟 Corner cleaning algorithm version (integrate to) ->  🐋 5sControl-docker version`
-
-**14.06.2023**
-🪟 v1.0.0-rc.2 -> 🐋 0.4.1
-
-algorithm
-
-+ fix: don't find worker detection in undefined detections from "window+worker" model
-
-report
-
-+ fix: correct sequence of drawing corners on photos
-+ fix: does not always draw points
-+ fix: if the processed corners are not equal to 4 - mark the report as incorrect
-+ chore: chronological order of the report photos
-+ chore: add start&end photos
-
-**06.06.2023**
-🪟 v1.0.0-rc.1 -> 🐋 0.4.0
-+ new model processing chain
-+ new models for window&worker and recognition of operations
-+ additional check to see if the operation is within the window
-+ new design of photos in reports
-
-**05.25.2023**
-🪟 0.3.1 -> 🐋 0.3.7
-+ updated models
-+ reducing rendering time and saving debug photos
-+ moving the debugger logic into a separate module
-
-🪟 0.3.0 -> 🐋 0.3.5
-+ model detection at workerpool
