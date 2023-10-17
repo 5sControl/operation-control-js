@@ -20,10 +20,8 @@
   },
   "homepage": "https://github.com/5sControl/operation-control-js#readme",
   "dependencies": {
-    "@supabase/supabase-js": "^2.26.0",
-    "socket.io-client": "^4.7.1",
-    "@napi-rs/canvas": "^0.1.39",
     "@tensorflow/tfjs-node": "^4.4.0",
-    "workerpool": "^6.4.0"
+    "canvas": "^2.11.2",
+    "socket.io-client": "^4.7.1"
   }
 }

@@ -1,4 +1,4 @@
-const {createCanvas, Image} = require('@napi-rs/canvas')
+const {createCanvas, Image} = require('canvas')
 
 class Drawer {
     constructor(buffer, eventName = "") {
@@ -32,7 +32,7 @@ class Drawer {
         this.ctx.beginPath()
         this.ctx.rect(x, y, width, height)
         this.ctx.stroke()
-        this.buffer = await this.canvas.encode('jpeg', 50)
+        this.buffer = this.canvas.toBuffer('image/jpeg', { quality: 0.5 })
     }
     async drawEvent(text) {
         if (!this.ctx) this.createCtx()
@@ -41,7 +41,7 @@ class Drawer {
         this.ctx.strokeText(`${text}`, 49, 1029)
         this.ctx.fillStyle = "white"
         this.ctx.fillText(`${text}`, 50, 1030)
-        this.buffer = await this.canvas.encode('jpeg', 50)
+        this.buffer = this.canvas.toBuffer('image/jpeg', { quality: 0.5 })
     }
     async drawPoint(point, cornerState) {
         if (!this.ctx) this.createCtx()
@@ -53,7 +53,7 @@ class Drawer {
             this.ctx.fill()
             this.drawSymbol(x, y, cornerState ? "mark" : "cross")
         }
-        this.buffer = await this.canvas.encode('jpeg', 50)
+        this.buffer = this.canvas.toBuffer('image/jpeg', { quality: 0.5 })
     }
     setBox(x, y) {
         return {
@@ -97,7 +97,7 @@ class Drawer {
         //TODO: draw only processed corners
         points.forEach(async (point, i) => promises.push(this.drawPoint(point, cornersState[i])))
         await Promise.all(promises)
-        this.buffer = await this.canvas.encode('jpeg', 50)
+        this.buffer = this.canvas.toBuffer('image/jpeg', { quality: 0.5 })
     }
     
 }

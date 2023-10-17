@@ -1,5 +1,5 @@
 const {bboxAtWorkspace} = require('../utils/2D')
-const {createCanvas, Image} = require('@napi-rs/canvas')
+const {createCanvas, Image} = require('canvas')
 const loadYoloV8 = require('./models/yolov8')
 
 class Detector {
@@ -64,7 +64,7 @@ class Detector {
         let newCan = createCanvas(width + OFFSET, height + OFFSET)
         let newCtx = newCan.getContext('2d')
         newCtx.putImageData(cuttedWorker, 0, 0)
-        const croppedBlob = await newCan.encode('jpeg', 90)
+        const croppedBlob = newCan.toBuffer('image/jpeg', { quality: 0.9 })
         return croppedBlob
     }
     async detectBatch(batch) {

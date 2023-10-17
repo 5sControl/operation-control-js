@@ -38,7 +38,8 @@ const report = {
             "extra": extra
         }
         const body = JSON.stringify(json, null, 2)
-        fetch(`${process.env.server_url}:80/api/reports/report-with-photos/`, {
+        console.log(body)
+        fetch(`http://${process.env.link_reports}`, {
             method: "POST",
             headers: { 'Content-Type': 'application/json;charset=utf-8' },
             body
