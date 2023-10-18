@@ -38,8 +38,9 @@ const report = {
             "extra": extra
         }
         const body = JSON.stringify(json, null, 2)
-        console.log(body)
-        fetch(`http://${process.env.link_reports}`, {
+        console.log(body, process.env.algorithm_name, process.env.link_reports)
+
+        fetch(process.env.link_reports, {
             method: "POST",
             headers: { 'Content-Type': 'application/json;charset=utf-8' },
             body
