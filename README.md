@@ -13,6 +13,7 @@ Empowers you to monitor and control the execution of technologically necessary n
 
 **Plug-in Operation control to 5controlS platform to start monitoring window seam trimming operations!**
 
+> Learn more about Operation control on the [5controlS website](https://5controls.com/solutions/operation-control).
 
 # **Documentation**
 
