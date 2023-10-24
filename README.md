@@ -3,7 +3,7 @@ Operation Control is one of the Official [5controlS](https://5controls.com/) alg
 
 Empowers you to monitor and control the execution of technologically necessary number of operations with ease. Our advanced AI algorithms provide real-time insights and predictions, enabling you to optimize your operations for maximum efficiency and profitability.
 
-![video](https://github.com/5sControl/operation-control-js/assets/131950264/6dc7e039-33dd-4b54-ae59-3eb801511134)
+![Operation-control](https://github.com/5sControl/5s-user-documentation/blob/main/assets/Operation-control.png)
 
 
 ## Key features
