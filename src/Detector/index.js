@@ -82,10 +82,13 @@ class Detector {
 
 const detector = new Detector()
 dispatcher.on("container started", async () => await detector.init())
-// dispatcher.on("batch ready", async ({batch}) => detector.detectBatch(batch))
 dispatcher.on("new snapshot received", async ({snapshot}) => {
-    if (!detector.model.w) return
-    const detections = await detector.detect(snapshot.buffer)
-    snapshot.detections = detections
-    dispatcher.emit("snapshot detections ready", { snapshot, notForConsole: true })
+    try {        
+        if (!detector.model) return
+        const detections = await detector.detect(snapshot.buffer)
+        snapshot.detections = detections
+        dispatcher.emit("snapshot detections ready", { snapshot, notForConsole: true })
+    } catch (error) {
+        console.log(error)
+    }
 })
