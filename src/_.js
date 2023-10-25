@@ -4,11 +4,6 @@ require('./Detector')
 require('./Control')
 require('./Report')
 
-var process = require('process') 
-setInterval(() => {
-    console.log(`Memory usage: ${Math.floor(process.memoryUsage().rss/1000000)}MB `) 
-}, 1000);
-
 dispatcher.emit("container started", { message: `
 launch: ${process.env.launch}
 camera_url: ${process.env.camera_url}
