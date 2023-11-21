@@ -1,5 +1,6 @@
 # About Operation Control JS
-Operation Control is one of the Official [5controlS](https://5controls.com/) algorithm.
+Operation Control is one of the Official [5controlS](https://5controls.com/) algorithm. Plug it in our video monitoring system with AI analysis and ERP Integration (Open Source) to ensure the quality of your products.
+
 
 Empowers you to monitor and control the execution of technologically necessary number of operations with ease. Our advanced AI algorithms provide real-time insights and predictions, enabling you to optimize your operations for maximum efficiency and profitability.
 
